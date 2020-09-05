@@ -1,3 +1,21 @@
+/*
+	This library contains functions to display de header of program
+	and to display program menu options 
+*/
+
+//Dependencies
+#include<unistd.h>
+#include<stdio.h>
+
+//Function to clean screen
+void ClrScr(){
+	int i = 0;
+     for(i = 0; i < 500; i++){
+          printf("\n");
+     }
+} 
+
+//Function to display program header
 void HEADER(){
 	
 	printf("****************************************************************************************************\n\n");
@@ -5,180 +23,159 @@ void HEADER(){
 	printf("****************************************************************************************************\n\n\n\n");
 }
 
-//Menu function
-void Menu(list_cad *main_list,FILE *data_base){
+//Custom libraries 
+#include"feedLibrary.h"
+#include"loadLibrary.h"
+#include"toolsLibrary.h"
+#include"sortLibrary.h"
+
+//Function to display menu of program
+void Menu(reg *regsList,char path[30],FILE *dataBase){
+	
+	//Local variables
+	int option = 0;
+	
+	//Clearing the list of records
+	cleanList(regsList);
+	regsList = newReg();
+				
+	//Loading data from archives for regsList 
+	regsList = (loadListFromTxt(regsList,dataBase,path)) == NULL ? (loadListFromJson(regsList,dataBase,path)) == NULL ? newReg() : 0 : (loadListFromTxt(regsList,dataBase,path));
+	ClrScr();
+	HEADER();
+	
+	//Displays menu options and informations
+	printf("Active Database: %c%s%c\n\n",34,path,34);
+	printf("Select an option:");
+	printf("\n\n1 - New register \n2 - View registers \n3 - Change register \n4 - Switch data base \n5 - About \n6 - Exit\n\n");
+	
+	//Selection menu
+	setbuf(stdin,NULL);
+	switch((getchar()-48)){
 		
-		//submenu sorting options
-		char submenu[220] ="\n\n  ================================\n |   1 - Ordenar por Data         |\n |   2 - Ordenar por Valor        |\n |   3 - Ordenar por Categoria    |\n |   ESC - Retornar ao menu       |\n  ================================\n";
-		
-		//frees memory allocated by main_list
-		deallocate_list(main_list);
-					
-		//read data from files for main_list and sort for date
-		load_list(main_list,data_base,month,year);
-		
-		//define color green
-		system("COLOR 0A");
-		
-		//displays menu options
-		system("cls");
-		HEADER();
-		printf("Selecione uma op��o:\n\n1 - Novo cadastro \n2 - Exibir cadastros \n3 - Alterar cadastro\n4 - Alternar base de dados\n5 - Sobre\n6 - Sair");
-		int option = -1;
-		
-		//selection menu
-		setbuf(stdin,NULL);
-		switch(getch()-48){
+		case 1:{				
 			
-			case 1:{				
-				system("cls");
-				//concatenate a new record in the list
-				add_new(category,main_list,"",Date);
+			//Add a new register in the list
+			ClrScr();
+			if(strcmp(regsList->date,"") != 0){
 				
-				//sort for date before burn in file
-				ord_date(main_list);
+				addEnd(regsList,newReg());
+				dataFeed(navEnd(regsList));
 				
-				//writes main_list in file
-				download_list(main_list,data_base,month,year);
-				Menu(main_list,data_base);	
-				break;
+			}else{
+				
+				dataFeed(regsList);
 			}
 			
-			case 2:{
-				
-				//check if main_list is empty
-				if(main_list->prox == NULL){
-					
-					//define color red
-					system("COLOR 0C");
+			//Sort by ascending date before writing to file
+			regsList = orderByDate(regsList);
 			
-					//feedback if main_list is empty
-					system("cls");
-					printf("\n\n\n\t\t\t\tN�o existem cadastros na main_lista!!!");
-					sleep (2);
-					
+			//Write regsList in file
+			saveListAsJson(regsList,dataBase,path);
+			saveListAsTxt(regsList,dataBase,path);
+			
+			//Return to menu
+			Menu(regsList,path,dataBase);
+			break;
+		}
+		
+		case 2:{
+			
+			//Validating regList
+			if(regsList != NULL && strcmp(regsList->date,"") != 0){
+				
+				//Loop of submenu
+				do{				
 					//Displaying regsList
 					ClrScr();
 					HEADER();
 					showRecords(orderByDate(regsList));
 					
-					//Loop of submenu
-					do{
-						
-						//define color green
-						system("COLOR 0A");
-						
-						//displaying main_list
-						system("cls");
-						HEADER();
-						ord_date(main_list);
-						show_records(main_list);
-						printf("%s",submenu);
-						
-						//Sort by ascending date
-						regsList = orderByDate(regsList);
-						
-					}else if(option == 2){
+					//Diplaying options
+					printf("\n\n   Select an option: ");
+					printf("\n\n   1 - Order by Date \n   2 - Order by Id  \n   3 - Order by Value \n   4 - Return to menu \n\n");
 					
-						//Sort by ascending id
-						regsList = orderById(regsList);
+					//Selection menu
+					setbuf(stdin,NULL);
+					switch((getchar()-48)){
 						
-					}else if(option == 3){
+						case 1:{
+							
+							//Sort by ascending date
+							regsList = orderByDate(regsList);
+							break;
+						}
 						
-						//Sort by ascending value
-						regsList = orderByValue(regsList);
-					
+						case 2:{
+							
+							//Sort by ascending id
+							regsList = orderById(regsList);
+							break;
+						}
+						
+						case 3: {
+							
+							//Sort by ascending value
+							regsList = orderByValue(regsList);
+							break;
+						}
+						
+						case 4:{
+							
+							option = 4;
+							break;
+						}
+						
+						default:{
+							
+							//Feedback default
+							ClrScr();
+							printf("\n\n\n\t\t\t\tInvalid option!");
+							sleep (1);
+							break;
+						}
 					}
 					
-					if(option != 1 && option != 2 && option != 4 && option !=3){
-						
-						//Feedback default
-						ClrScr();
-						printf("\n\n\n\t\t\t\tInvalid option!");
-						sleep (1);
-						
-						if(option != 1 && option != 2 && option != -21 && option !=3){
-							
-							//define color red
-							system("COLOR 0C");
-							
-							//feedback default
-							system("cls");
-							printf("\n\n\n\t\t\t\tOp��o inv�lida!");
-							sleep (1);
-							
-						}
-					}while(option != -21);
-				}
-				Menu(main_list,data_base);
-				break;
-			}
-			
-			case 3:{
-				system("cls");
-				HEADER();
+				}while(option != 4);
 				
 			}else{
-				
-				//sort for date before burn in file
-				ord_date(main_list);
-				
-				//writes list in file
-				download_list(main_list,data_base,month,year);
-				Menu(main_list,data_base);		
-				break;
-			}
-			
-			case 4:{
-				
-				system("cls");
-				HEADER();	
-							
-				//selects other periods to load in main_file
-				show_data_base(month,year,"",files);
-				Menu(main_list,data_base);				
-				break;
-			}
-				
-			case 5:{
-				
-				//about
-				system("cls");
-				HEADER();
-				printf("Este software � gratuito e destinado para uso pessoal.\nSeu uso em ambientes empresariais n�o � recomendado por quest�es de seguran�a!!!\n\n");
-				printf("Desenvolvedor: Quemuel Alves Nassor\n\nContato ou suporte: quemuelalp@hotmail.com\n\nVers�o: 1.0.2");
-				setbuf(stdin,NULL);
-				getch();
-				Menu(main_list,data_base);
-				break;
+
+				//Feedback if regsList is empty
+				ClrScr();
+				printf("\n\n\n\t\t\t\tNo exists records to display!!!");
+				sleep (2);
 				
 			}
 			
-			case 6:{
-				
-				//exit of program
-				system("cls");
-				exit(0);
-				break;
-			}
-				
-			default:
-				
-				//define color red
-				system("COLOR 0C");
-				
-				//feedback default
-				system("cls");
-				printf("\n\n\n\t\t\t\tOp��o inv�lida!");
-				sleep(1);
-				Menu(main_list,data_base);
+			//Return to menu
+			Menu(regsList,path,dataBase);
+			break;
+		}
+		
+		case 3:{
+			ClrScr();
+			HEADER();
+			
+			//Edit a register of regsList
+			editRecord(regsList);
+			
+			//Sort by ascending date before writing to file
+			orderByDate(regsList);
+			
+			//Write regsList in file
+			saveListAsJson(regsList,dataBase,path);
+			saveListAsTxt(regsList,dataBase,path);
+
+			//Return to menu
+			Menu(regsList,path,dataBase);
+			break;
 		}
 		
 		case 4:{
 			
 			//Switch data base
-			switchDataBase(path,dataBase);
-						
+			switchDataBase();
+
 			//Return to menu
 			Menu(regsList,path,dataBase);
 			break;
@@ -208,7 +205,7 @@ void Menu(list_cad *main_list,FILE *data_base){
 			break;
 		}
 			
-		default:
+		default:{
 			
 			//Feedback default
 			ClrScr();
@@ -217,6 +214,8 @@ void Menu(list_cad *main_list,FILE *data_base){
 			
 			//Return to menu
 			Menu(regsList,path,dataBase);
+			break;
+		}
 	}
 		
 	//Clearing the list of records

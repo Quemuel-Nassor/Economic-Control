@@ -8,10 +8,6 @@
 #include<unistd.h>
 #include<stdio.h>
 
-//Extern declaration
-extern void HEADER();
-extern void ClrScr();
-
 //Function to display records in the regList
 void showRecords(reg *ficha){
 	

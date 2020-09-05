@@ -14,12 +14,15 @@
 #define C 7
 
 //Global variables and extern declarations
-int sizeOfCategoryList;
 char matrixYears[L][C];
-char categoryList[LIN][COL];
+extern int sizeOfCategoryList;
+extern char categoryList[LIN][COL];
+extern char yearsPath[25];
+extern char basePath[30];
+extern FILE *dataBase;
 
 //Function to load configurations
-loadConfig(char categoryList[LIN][COL]){
+void loadConfig(char categoryList[LIN][COL]){
 	
 	//Local variables
 	long start = 76;
@@ -44,7 +47,7 @@ loadConfig(char categoryList[LIN][COL]){
 reg *loadListFromTxt(reg *regList,FILE *dataBase, char path[30]){
 	
 	//Local variables
-	char localPath[50], strLine[500], value[100];
+	char localPath[30], strLine[500], value[100];
 	int index, chrKeyCount;
 	strcpy(localPath,path);
 	strcat(localPath,".txt");
@@ -105,7 +108,7 @@ reg *loadListFromTxt(reg *regList,FILE *dataBase, char path[30]){
 reg *loadListFromJson(reg *regList,FILE *dataBase, char path[30]){
 		
 	//Local variables
-	char localPath[50], strLine[500], value[100];
+	char localPath[30], strLine[500], value[100];
 	int index, chrKeyCount;
 	strcpy(localPath,path);
 	strcat(localPath,".json");
@@ -197,7 +200,7 @@ void cleanList(reg *regList){
 void saveListAsTxt(reg *regList, FILE *dataBase, char path[30]){
 	
 	//Local variables
-	char localPath[50];
+	char localPath[30];
 	strcpy(localPath,path);
 	strcat(localPath,".txt");
 	
@@ -225,7 +228,7 @@ void saveListAsTxt(reg *regList, FILE *dataBase, char path[30]){
 void saveListAsJson(reg *regList, FILE *dataBase, char path[30]){
 	
 	//Local variables
-	char localPath[50];
+	char localPath[30];
 	strcpy(localPath,path);
 	strcat(localPath,".json");
 	
@@ -299,36 +302,35 @@ void saveListAsJson(reg *regList, FILE *dataBase, char path[30]){
 }
 
 //Function to switch database
-void switchDataBase(char Path[30],FILE *dataBase){
+void switchDataBase(){
 	
 	//Local variables
-	int i,count = 0,countYears = 0;
-	char newPath[30], option, year[7],month[11];
+	int i, countSeparators = 0, countYears = 0;
+	char newPath[30], option, currentYear[7], currentMonth[11];
 	
-	for(i=0;i<strlen(Path);i++){
+	//Loop to get year and month from current data base
+	for(i=0;i<strlen(basePath);i++){
 		
-		if(Path[i] != BARKEY[0] && count == 1){
-			year[i] = Path[i];
+		//Get year
+		if(basePath[i] != (char) DIRECTORY_SEPARATOR_CHAR[0] && countSeparators == 1){
+			currentYear[i] = basePath[i];
 		}
 		
-		if(Path[i] != BARKEY[0] && count == 2){
-			month[i] = Path[i];
+		//Get month
+		if(basePath[i] != (char) DIRECTORY_SEPARATOR_CHAR[0] && countSeparators == 2){
+			currentMonth[i] = basePath[i];
 		}
 		
-		Path[i] == BARKEY[0] ? count++ : 0;
+		//Increase the count of directory separators
+		basePath[i] == (char) DIRECTORY_SEPARATOR_CHAR[0] ? countSeparators++ : 0;
 		
 	}
-	
-	//Local variables
-	char yearsPath[30] = "Database";
-	strcat(yearsPath,BARKEY);
-	strcat(yearsPath,"list_years.txt");
 	
 	//Opens the year record in read mode
 	FILE *yearList = fopen(yearsPath,"r");
 	
 	//Loop for fill matrix of years
-	while(fscanf(yearList,"%s",matrixYears[countYears]) != EOF || (countYears == 9999)){
+	while(fscanf(yearList,"%s",matrixYears[countYears]) != EOF || (countYears == 1000)){
 		countYears++;
 	}
 	
@@ -337,7 +339,7 @@ void switchDataBase(char Path[30],FILE *dataBase){
 	
 	ClrScr();
 	HEADER();
-	printf("Active Database: %c%s%c\n\n",34,Path,34);
+	printf("Active Database: %c%s%c\n\n",34,basePath,34);
 	printf("Select a year\n\n");
 
 	//loop to display and select years
@@ -352,17 +354,16 @@ void switchDataBase(char Path[30],FILE *dataBase){
 	option = getchar()-48;
 
 	//Checking if is currente or other
-	if(strcmp(year,matrixYears[option-1]) != 0){
-		strcpy(year, option-1 > countYears || option-1 < 0 ? year : matrixYears[option-1]);
+	if(strcmp(currentYear,matrixYears[option-1]) != 0){
+		strcpy(currentYear, option-1 > countYears || option-1 < 0 ? currentYear : matrixYears[option-1]);
 	}
-	year[strlen(year)-1] = BARKEY[0];
-	
+
 	//Reset option
 	option = '\0';	
 	
 	ClrScr();
 	HEADER();
-	printf("Active Database: %c%s%c\n\n",34,Path,34);
+	printf("Active Database: %c%s%c\n\n",34,basePath,34);
 	printf("Select a month\n\n");
 
 	//loop to display and select months
@@ -377,20 +378,19 @@ void switchDataBase(char Path[30],FILE *dataBase){
 	option = getchar()-48;
 		
 	//Checking if is currente or other
-	if(strcmp(month,MonthsOfYear[option-1]) != 0){
-		strcpy(month, option-1 > 12 || option-1 < 0 ? month : MonthsOfYear[option-1]);
+	if(strcmp(currentMonth,MonthsOfYear[option-1]) != 0){
+		strcpy(currentMonth, option-1 > 12 || option-1 < 0 ? currentMonth : MonthsOfYear[option-1]);
 	}
 	
 	//Creating path to data base
-	strcpy(newPath,"Database");
-	strcat(newPath,BARKEY);
-	strcat(newPath,year);
-	strcat(newPath,month);
+	strcpy(basePath,"Database");
+	strcat(basePath,DIRECTORY_SEPARATOR_CHAR);
+	strcat(basePath,currentYear);
+	strcat(basePath,DIRECTORY_SEPARATOR_CHAR);
+	strcat(basePath,currentMonth);
 	
 	//Switch dataBase
-	dataBase = fopen(newPath,"r");
-	strcpy(Path,newPath);
-	
+	dataBase = fopen(basePath,"r");
 	fclose(dataBase);
 	
 }

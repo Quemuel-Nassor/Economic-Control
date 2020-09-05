@@ -8,11 +8,10 @@
 #include<stdio.h>
 #include<ctype.h>
 
-//Extern declarations
-extern void ClrScr();
-extern void HEADER();
+//Global variables
 extern char categoryList[LIN][COL];
 extern int sizeOfCategoryList;
+extern DateTime dateTime;
 
 //Function to get date value
 void getNewDate(char input[20]){
@@ -49,19 +48,20 @@ void getNewDate(char input[20]){
 			//Insert the new value of date and concatenate the add-on
 			newDate[strlen(newDate)-1] = ' ';
 			getDate();
-			strcat(newDate,Time);
+			strcat(newDate,dateTime.Time);
 			strcpy(input,newDate);
 		}
 	}
 }
 
 //Function to get category
-void getCategory(char input[COL], int sizeOfCategoryList){
+void getCategory(char input[COL]){
 	
 	//Menu to select category from record
 	HEADER();
 	printf("Select a category for record: \n\n");
 	int count = 0, Index = 0;
+	char selectedOption[3];
 	
 	//Display all categories in categoryList
 	for(count = 0; count < sizeOfCategoryList-1; count++){
@@ -71,11 +71,12 @@ void getCategory(char input[COL], int sizeOfCategoryList){
 	
 	//Returns the selected category if the Index is in the range Index <= count or Index >= 0 if not return NULL
 	setbuf(stdin,NULL);
-	Index = getchar()-48;
+	fgets(selectedOption,3,stdin);
+	Index = atoi(selectedOption);
 	
 	//Checking if is new or existing
 	if(strcmp(input,"\0") == 0 || strcmp(input,categoryList[Index-1]) == 0){
-		strcpy(input, Index-1 > count || Index-1 < 0 ? "" : categoryList[Index-1]);
+		strcpy(input, (Index-1 > count || Index-1 < 0 ? "" : categoryList[Index-1]));
 	}
 }
 
@@ -134,7 +135,7 @@ void dataFeed(reg *regsList){
 		
 		//Set the date of the new record to DateTimeNow
 		getDate();
-		strcpy(regsList->date,DateTimeNow);
+		strcpy(regsList->date,dateTime.DateTimeNow);
 		
 	}else{
 		
@@ -166,7 +167,7 @@ void dataFeed(reg *regsList){
 	
 	//Get selected category to the regList
 	ClrScr();
-	getCategory(regsList->category,sizeOfCategoryList);
+	getCategory(regsList->category);
 	regsList->category[strlen(regsList->category)-1] = '\0';
 	
 	//Clean screen and display data
@@ -187,7 +188,7 @@ void dataFeed(reg *regsList){
 	initalizeString(value,100);
 	printf("\nValue: ");
 	setbuf(stdin,NULL);
-	fgets(value,100,stdin);	
+	fgets(value,100,stdin);
 	value[strlen(value)-1] = '\0';	
 	
 	//Set the value of the new record to NULL if it is empty
