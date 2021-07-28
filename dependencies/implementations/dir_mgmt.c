@@ -1,62 +1,42 @@
 /*
- *  Library to create folders, get the current directory path,
- *  and complement the file names with the current directory path
- *  and delete files and directory trees
- *  
- *  Author: Quemuel Alves Nassor
- *  Date: 27/12/20
-*/
+ * Library to create folders, get the current directory path, and complement the file names with the
+ * current directory path and delete files and directory trees
+ *
+ * Author: Quemuel Alves Nassor
+ * Date: 27/12/20
+ */
 
-/*
-    Dependencies
-*/
+#include <stdarg.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <errno.h>
 #include <dirent.h>
+#include <errno.h>
 
 #if defined(_WIN32) || defined(WIN32)
     #include "..\include\dir_mgmt.h"
+    const char DIR_SEPARATOR_CHR = '\\';
 #elif defined(__unix__)
     #include "../include/dir_mgmt.h"
+    const char DIR_SEPARATOR_CHR = '/';
 #endif
 
 /*
-    Function to validate error message
-        parameter: msg, error message to return
-        parameter: path, place of error
-        return: validated error message on success or empty on failure
+    Function to check if directory exist
+        parameter: path, path to check
+        return: errno code on error or EXIT_SUCCESS on success;
 */
-char *error_mess(char *msg, char *path)
+int check_if_dir_exist(char *path)
 {
-
-    char *errorMessage = (char *)malloc(MAX_ERROR_MESS * sizeof(char));
-    errorMessage[0] = '\0';
-
-    if ((int)strlen(msg) == 0 && (int)strlen(path) == 0)
-    {
-        errorMessage = NULL;
-        errno = ENODATA;
-        perror("Invalid message");
-    }
-    else if ((int)strlen(msg) + (int)strlen(path) > MAX_ERROR_MESS)
-    {
-        errorMessage = NULL;
-        errno = EMSGSIZE;
-        perror("The error message is too long");
-    }
-    else
-    {
-        strcpy(errorMessage, msg);
-        strcat(errorMessage, " (");
-        strcat(errorMessage, path);
-        strcat(errorMessage, ")\0");
-    }
-
-    return errorMessage;
+    struct stat st = {0};         /*File structure*/
+    int result = stat(path, &st); /*Testing if path is valid*/
+    char *errorMsg = error_mess("The directory",path);
+    // strcpy(errorMsg, error_mess("The directory",path));
+    result != EXIT_SUCCESS ? strcat(errorMsg, " does not exist") : strcat(errorMsg, " exists");
+    perror(errorMsg);
+    return result;
 }
 
 /*
@@ -64,34 +44,32 @@ char *error_mess(char *msg, char *path)
         parameter: path, place where the folder will be created
         return: errno code on error or EXIT_SUCCESS on success;
 */
-
 #if defined(_WIN32) || defined(WIN32)
-#include <direct.h>
-int mk_dir(char *path)
-{
-
-    if (mkdir(path) != 0)
+    #include <direct.h>
+    int mk_dir(char *path)
     {
-        char *errorMessage = ERROR_MESS("Failed to create folder", path);
-        perror(errorMessage);
-    }
 
-    return errno;
-}
+        if (mkdir(path) != 0)
+        {
+            char *errorMessage = error_mess("Failed to create folder", path);
+            perror(errorMessage);
+        }
+
+        return errno;
+    }
 #elif __unix__
-#include <unistd.h>
-
-int mk_dir(char *path)
-{
-
-    if (mkdir(path, 0777) != 0)
+    #include <unistd.h>
+    int mk_dir(char *path)
     {
-        char *errorMessage = error_mess("Failed to create folder", path);
-        perror(errorMessage);
-    }
 
-    return errno;
-}
+        if (mkdir(path, 0777) != 0)
+        {
+            char *errorMessage = error_mess("Failed to create folder", path);
+            perror(errorMessage);
+        }
+
+        return errno;
+    }
 
 #endif
 
@@ -103,9 +81,11 @@ int mk_dir(char *path)
 */
 int get_parent_dir(char *path, char *parent_path)
 {
+    
     struct stat st = {0};                                         /*File structure*/
     char *last_file_or_folder = strrchr(path, DIR_SEPARATOR_CHR); /*Find and retrieve the string starting with the last character DIR_SEPARATOR_CHR*/
-    int size = (int)(strlen(path) - strlen(last_file_or_folder));
+    int size_parent = (last_file_or_folder != NULL ? (int)strlen(last_file_or_folder) : 0);
+    int size = (int)((int)strlen(path) - size_parent);
 
     parent_path = (char *)malloc(size * sizeof(char));
     parent_path[0] = '\0';
@@ -116,8 +96,10 @@ int get_parent_dir(char *path, char *parent_path)
         parent_path[size] = '\0';
     }
 
+
     return stat(path, &st); /*Testing if path is valid*/
 }
+
 
 /*
     Function to create directory tree
@@ -140,22 +122,23 @@ int mk_dir_tree(char *path)
 
     char *parent_path;
     int result = get_parent_dir(path, parent_path);
+    printf("\n\npath {%s} - parent {%s}",path,parent_path);
 
-    if (result == 0 && errno == 0)
+    if (result == EXIT_SUCCESS && errno == EXIT_SUCCESS)
     {
         errno = EEXIST;
         char *errorMessage = error_mess("Directory tree exist", path);
         perror(errorMessage);
     }
 
-    if (result == EXIT_FAILURE && errno == ENOENT && (int)strlen(parent_path) != 0)
+    if (result != EXIT_SUCCESS && errno == ENOENT)
     {
-        mk_dir_tree(parent_path); /*Recursion call*/
+        if((int)strlen(parent_path) != 0) mk_dir_tree(parent_path); /*Recursion call*/
         mk_dir(path);             /*Return of recursion*/
         /* result = stat(path, &st);                       /*Testing if path is valid*/
         get_parent_dir(path, parent_path) == 0 ? errno = EXIT_SUCCESS : 0;
     }
-    else if ((result == EXIT_FAILURE && errno != ENOENT) || (result == EXIT_FAILURE && errno == ENOENT && (int)strlen(parent_path) == 0))
+    else if ((result != EXIT_SUCCESS && errno != ENOENT) || (result != EXIT_SUCCESS && errno == ENOENT && (int)strlen(parent_path) == 0))
     {
         char *errorMessage = error_mess("Failed to create directory tree", path);
         perror(errorMessage);
@@ -224,26 +207,51 @@ char *get_cur_dir(void)
 
 /*
     Function to join directory path with file name or folder name
-        parameter: path, where the name of the file or folder will be concatenated
-        parameter: folder_or_filename, the file or folder that will be concatenated
-        return: errno code on error or EXIT_SUCCESS on success;
+        parameters: params, file or folder names that will be joined
+        return: joined path
 */
-int join_path(char *path, char *folder_or_filename)
+int join_path(char *path, char *params,...)
 {
-    if ((int)strlen(path) > 0 || (int)strlen(folder_or_filename) > 0)
+    va_list words;
+    char *folder_or_filename;
+    int params_count = 0;
+
+    if(strcmp(path,"\0")==0) 
     {
-        path[(int)strlen(path)] = (int)strlen(path) > 0 ? DIR_SEPARATOR_CHR : '\0';
-        path[(int)strlen(path) + (int)strlen(folder_or_filename)] = '\0';
-        strcat(path, folder_or_filename);
+        strcpy(path,params); 
     }
     else
     {
-        char msg[MAX_ERROR_MESS] = "Failed to join paths (";
-        strcat(msg, path);
-        strcat(msg, " and\0");
-        char *errorMessage = error_mess(msg, folder_or_filename);
-        perror(errorMessage);
+        path[strlen(path)] = DIR_SEPARATOR_CHR;
+        strcat(path,params); 
     }
+
+    /* Initializing parameter list */
+    va_start(words, params);
+
+    /* Iterating the parameter list */
+    while ((folder_or_filename = va_arg(words, char*))!= NULL)  
+    {
+        if((int)strlen(path) == PATH_MAX) break;
+
+        int param_size = (int)strlen(folder_or_filename);
+
+        if(params_count >= 0 && folder_or_filename != NULL) path[strlen(path)] = DIR_SEPARATOR_CHR;
+        strcat(path, folder_or_filename);
+
+        if (params_count == 0 && (folder_or_filename == NULL || param_size == 0))
+        {
+            char *errorMessage = error_mess("Failed to join paths (",path);
+            strcat(errorMessage, " and\0");
+            strcat(errorMessage, folder_or_filename);
+            perror(errorMessage);
+        }
+
+        params_count++;
+    }
+
+    /* Ending parameter list */
+    va_end(words);
 
     return errno;
 }
