@@ -9,10 +9,10 @@
 #include<unistd.h>
 
 //Function to order recList by ascending date
-/* rec *orderByDate(rec *recList){
+/* record *orderByDate(record *recList){
 	
 	//Local variables
-	rec *aux, *percursor;
+	record *aux, *percursor;
 	
 	//Check if recsList is empty
 	if(recList == NULL|| strcmp(recList->date ,"\0") == 0){
@@ -25,7 +25,7 @@
 	}else{
 	
 		//Set start point of percursor
-		percursor = nav_start(recList);
+		percursor = navigate_to_start(recList);
 			
 		//percursor loop
 		while(percursor != NULL){	
@@ -53,14 +53,14 @@
 		}
 	}
 	
-	return nav_start(recList);
+	return navigate_to_start(recList);
 } */
 
 //Function to order recList by ascending id
-rec *orderById(rec *recList){
+record *orderById(record *recList){
 	
 	//Local variables
-	rec *aux, *percursor;
+	record *aux, *percursor;
 	
 	//Check if recsList is empty
 	if(recList == NULL/* || strcmp(recList->date ,"\0") == 0*/){
@@ -73,7 +73,7 @@ rec *orderById(rec *recList){
 	}else{
 		
 		//Set start point of percursor
-		percursor = nav_start(recList);
+		percursor = navigate_to_start(recList);
 			
 		//percursor loop
 		while(percursor != NULL){	
@@ -101,14 +101,14 @@ rec *orderById(rec *recList){
 		}
 	}
 	
-	return nav_start(recList);
+	return navigate_to_start(recList);
 }
 
 //Function to order recList by ascending value
-rec *orderByValue(rec *recList){
+record *orderByValue(record *recList){
 	
 	//Local variables
-	rec *aux, *percursor;
+	record *aux, *percursor;
 	
 	//Check if recsList is empty
 	if(recList == NULL/* || strcmp(recList->date ,"\0") == 0*/){
@@ -121,7 +121,7 @@ rec *orderByValue(rec *recList){
 	}else{
 	
 		//Set start point of percursor
-		percursor = nav_start(recList);
+		percursor = navigate_to_start(recList);
 			
 		//percursor loop
 		while(percursor != NULL){	
@@ -149,5 +149,5 @@ rec *orderByValue(rec *recList){
 		}
 	}
 	
-	return nav_start(recList);
+	return navigate_to_start(recList);
 }

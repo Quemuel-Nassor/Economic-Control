@@ -76,7 +76,7 @@ int main(void){
 	
 	//Load category list
 	loadConfig(categoryList);
-	rec *list = new_rec();
+	record *list = new_record();
 	//Call menu program function
 	Menu(list,basePath,dataBase);
 

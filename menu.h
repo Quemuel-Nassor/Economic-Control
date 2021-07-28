@@ -12,17 +12,17 @@
 #include"sortLibrary.h"
 
 //Function to display menu of program
-void Menu(rec *recsList,char path[30],FILE *dataBase){
+void Menu(record *recsList,char path[30],FILE *dataBase){
 	
 	//Local variables
 	int option = 0;
 	
 	//Clearing the list of records
 	clean_list(recsList);
-	recsList = new_rec();
+	recsList = new_record();
 				
 	//Loading data from archives for recsList 
-	recsList = (loadListFromTxt(recsList,dataBase,path)) == NULL ? (loadListFromJson(recsList,dataBase,path)) == NULL ? new_rec() : 0 : (loadListFromTxt(recsList,dataBase,path));
+	recsList = (loadListFromTxt(recsList,dataBase,path)) == NULL ? (loadListFromJson(recsList,dataBase,path)) == NULL ? new_record() : 0 : (loadListFromTxt(recsList,dataBase,path));
 	ClrScr();
 	HEADER();
 	
@@ -41,8 +41,8 @@ void Menu(rec *recsList,char path[30],FILE *dataBase){
 			ClrScr();
 			if(recsList->id != 0){
 				
-				add_end(recsList,new_rec());
-				dataFeed(nav_end(recsList));
+				add_end(recsList,new_record());
+				dataFeed(navigate_to_end(recsList));
 				
 			}else{
 				
@@ -202,5 +202,5 @@ void Menu(rec *recsList,char path[30],FILE *dataBase){
 		
 	//Clearing the list of records
 	clean_list(recsList);
-	recsList = new_rec();
+	recsList = new_record();
 }

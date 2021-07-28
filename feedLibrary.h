@@ -19,7 +19,7 @@ void getNewDate(char input[20]){
 	//Local variables
 	int index;
 	char newDate[20];
-	init_str(newDate,20);
+	strcpy(newDate,"\0");
 	
 	//Read new date and concatenate the add-on
 	ClrScr();
@@ -119,14 +119,14 @@ int getId(void){
 }
 
 //Function to fill the data of new record
-void dataFeed(rec *recsList){
+void dataFeed(record *recsList){
 	
 	//Set id of recister
 	recsList->id = recsList->id == 0 ? getId() : recsList->id;
 	
 	ClrScr();
 	HEADER();
-	printf("Id: %li\n",recsList->id);
+	printf("Id: %lu\n",recsList->id);
 	
 //Receives date data
 //===================================================================
@@ -168,15 +168,15 @@ void dataFeed(rec *recsList){
 	
 	//Get selected category to the recList
 	ClrScr();
-	getCategory(recsList->category);
-	recsList->category[strlen(recsList->category)-1] = '\0';
+	// getCategory(recsList->category);
+	// recsList->category[strlen(recsList->category)-1] = '\0';
 	
 	//Clean screen and display data
 	ClrScr();
 	HEADER();
-	printf("Date: %s",recsList->datetime.fmt_str(recsList->datetime));
+	printf("Date: %s",recsList->datetime.format_string(recsList->datetime));
 	printf("\nDescription: %s",recsList->description);
-	printf("\nCategory: %s",recsList->category);
+	// printf("\nCategory: %s",recsList->category);
 					
 //Receives value data
 //===================================================================		
@@ -186,7 +186,7 @@ void dataFeed(rec *recsList){
 	char value[100];
 	
 	//Get value input
-	init_str(value,100);
+	strcpy(value,"\0");
 	printf("\nValue: ");
 	setbuf(stdin,NULL);
 	fgets(value,100,stdin);
@@ -198,9 +198,9 @@ void dataFeed(rec *recsList){
 	//Clean screen and display data
 	ClrScr();
 	HEADER();
-	printf("Date: %s",recsList->datetime.fmt_str(recsList->datetime));
+	printf("Date: %s",recsList->datetime.format_string(recsList->datetime));
 	printf("\nDescription: %s",recsList->description);
-	printf("\nCategory: %s",recsList->category);
+	// printf("\nCategory: %s",recsList->category);
 	printf("\nValue: %.2Lf",recsList->value);
 
 //Receives details data

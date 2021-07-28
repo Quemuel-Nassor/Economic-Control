@@ -9,10 +9,10 @@
 #include<stdio.h>
 
 //Function to display records in the recList
-void showRecords(rec *ficha){
+void showRecords(record *ficha){
 	
 	//Local variables
-	rec *temp = ficha;
+	record *temp = ficha;
 	int totalRecords = 0;
 	double sumValue = 0;
 	
@@ -44,10 +44,10 @@ void showRecords(rec *ficha){
 }
 
 //Function to edit an record
-void editRecord(rec *recList){
+void editRecord(record *recList){
 	
 	//Local variables
-	rec *temp = recList;
+	record *temp = recList;
 	int idKeyWord = 0;	
 	
 	//Receive idKeyWord to search
