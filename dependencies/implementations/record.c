@@ -1,10 +1,9 @@
 /*
- *	This library contains a definition of the
- *	data type of the "rec" and methods to
- *	manipulate dinamic lists of him
- *	
- *   Author: Quemuel Alves Nassor
- *   Date: 01/05/21
+ * This library contains a definition of the data type of the "rec" and methods to manipulate
+ * dinamic lists of him
+ *
+ * Author: Quemuel Alves Nassor
+ * Date: 01/05/21
  */
 
 #include <stdio.h>
@@ -12,155 +11,213 @@
 #include <string.h>
 
 #if defined(_WIN32) || defined(WIN32)
-    #include "..\include\record.h"
+#include "..\include\record.h"
 #elif defined(__unix__)
-    #include "../include/record.h"
+#include "../include/record.h"
 #endif
 
-/* Function to initialize strings */
-void init_str(char *string, int length)
-{
-    int i;
-    for (i = length - 1; i > -1; i--)
-    {
-        string[i] = '\0';
-    };
-}
-
-/* Function to display record */
-void show_rec(rec *item)
+/*
+ * Function to display record
+ * parameter: item, record to show
+ */
+void show_record(record* item)
 {
     printf("          Id: %li\n", item->id);
-    printf("          Date: %s\n", dtm_str(item->datetime));
-    printf("          Category: %s\n", item->category);
+    printf("          Date: %s\n", item->datetime.format_string(item->datetime));
+    printf("          Category id: %li\n", item->category_id);
     printf("          Description: %s\n", item->description);
     printf("          Value: %.2Lf\n", item->value);
     printf("          Details: %s\n", item->details);
     printf("----------------------------------------------------------------------------------------------------\n");
 }
 
-/* Function to get end of list */
-rec *nav_end(rec *list)
+/*
+ * Function to get end of list
+ * parameter: list, list to iterate
+ * return: last element pointer
+ */
+record* navigate_to_end(record* list)
 {
-    rec *end = list;
+    record* end = list;
 
     while (end->next != NULL)
     {
         end = end->next;
     }
+
     return end;
 }
 
-/* Function to get start of list */
-rec *nav_start(rec *list)
+/*
+ * Function to get start of list
+ * parameter: list, list to iterate
+ * return: first element pointer
+ */
+record* navigate_to_start(record* list)
 {
-    rec *start = list;
+    record* start = list;
 
     while (start->prev != NULL)
     {
         start = start->prev;
     }
+
     return start;
 }
 
-/* Function to add on start of list */
-rec *add_start(rec *list, rec *newItem)
+/*
+ * Function to add an record on start of list
+ * parameter: list, list to iterate and return the first element pointer
+ * parameter: new_item, element to add on start of list
+ * return: first element pointer
+ */
+record* add_start(record* list, record* new_item)
 {
-    list = nav_start(list);
-    newItem->prev = list->prev;
-    list->prev = newItem;
-    newItem->next = list;
-    return newItem;
+    list = navigate_to_start(list);
+
+    new_item->prev = list->prev;
+    list->prev = new_item;
+    new_item->next = list;
+
+    return new_item;
 }
 
-/* Function to add on middle of list */
-rec *add_middle(rec *list, rec *newItem)
+/*
+ * Function to add on middle of list
+ * parameter: list, list to iterate
+ * parameter: new_item, element to add on middle of list
+ * return: first element pointer
+ */
+record* add_middle(record* list, record* new_item)
 {
-    newItem->next = list->next;
-    list->next != NULL ? list->next->prev = newItem : 0;
-    newItem->prev = list;
-    list->next = newItem;
-    return nav_start(list);
+    new_item->next = list->next;
+    list->next != NULL ? list->next->prev = new_item : 0;
+    new_item->prev = list;
+    list->next = new_item;
+
+    return navigate_to_start(list);
 }
 
-/* Function to add on end of list */
-void add_end(rec *list, rec *newItem)
+/*
+ * Function to add on end of list
+ * parameter: list, list to iterate
+ * parameter: new_item, element to add on middle of list
+ */
+void add_end(record* list, record* new_item)
 {
-    list = nav_end(list);
-    newItem->prev = list;
-    newItem->next = list->next;
-    list->next = newItem;
+    list = navigate_to_end(list);
+
+    new_item->prev = list;
+    new_item->next = list->next;
+    list->next = new_item;
 }
 
-/* Function to remove record of start of list */
-rec *rem_start(rec *list)
+/*
+ * Function to remove record of start of list
+ * parameter: list, list to iterate
+ * return: new first element pointer
+ */
+record* remove_start(record* list)
 {
-    list = nav_start(list);
-    rec *temp = list->next;
-    (temp != NULL) ? (temp->prev = list->prev) : 0;
+    list = navigate_to_start(list);
+
+    record* new_start = list->next;
+
+    if (new_start != NULL)
+        new_start->prev = list->prev;
+
     free(list);
-    return temp;
+
+    return new_start;
 }
 
-/* Function to remove record of middle of list */
-rec *rem_middle(rec *list)
+/*
+ * Function to remove record of middle of list
+ * parameter: list, list to iterate
+ * return: first element pointer
+ */
+record* remove_middle(record* list)
 {
-    rec *temp = nav_start(list);
+    record* elem = navigate_to_start(list);
+
     if (list->prev != NULL && list->next != NULL)
     {
         list->prev->next = list->next;
         list->next->prev = list->prev;
+
         free(list);
     }
-    return temp;
+
+    return navigate_to_start(elem);
 }
 
-/* Function to remove record of end of list */
-void rem_end(rec *list)
+/*
+ * Function to remove record of end of list
+ * parameter: list, list to iterate
+ */
+void remove_end(record* list)
 {
-    list = nav_end(list);
-    (list->prev != NULL) ? (list->prev->next = list->next) : 0;
+    list = navigate_to_end(list);
+
+    if (list->prev != NULL)
+        list->prev->next = list->next;
+
     free(list);
 }
 
-/* Function to remove all record of list */
-void clean_list(rec *list)
+/*
+ * Function to remove all record of list
+ * parameter: list, list to iterate
+ */
+void clean_list(record* list)
 {
-    list = list->prev != NULL ? nav_start(list) : list;
+    list = list->prev != NULL ? navigate_to_start(list) : list;
 
     while (list->next != NULL)
     {
-        rem_end(list);
+        remove_end(list);
     }
+
     free(list);
 }
 
-/* Default record constructor */
-rec *new_rec(void)
+/*
+ * Default record constructor
+ * return: minimally initialized registry
+ */
+record* new_record(void)
 {
-    rec *emptyRec = (rec *)malloc(sizeof(rec));
-    emptyRec->next = NULL;
-    emptyRec->prev = NULL;
-    emptyRec->datetime = new_dtm();
-    init_str(emptyRec->description, MAX_DESCRIPTION);
-    init_str(emptyRec->category, MAX_CATEGORY);
-    init_str(emptyRec->details, MAX_DETAILS);
-    emptyRec->value = 0.00;
-    emptyRec->id = 0;
-    emptyRec->show = &show_rec;
-    emptyRec->add = &add_end;
-    return emptyRec;
+    record* empty_rec = (record*)malloc(sizeof(record));
+    empty_rec->next = NULL;
+    empty_rec->prev = NULL;
+    empty_rec->datetime = new_datetime();
+    strcpy(empty_rec->description, "\0");
+    strcpy(empty_rec->details, "\0");
+    empty_rec->show = &show_record;
+    empty_rec->add = &add_end;
+
+    return empty_rec;
 }
 
-/* Overloaded record constructor */
-rec *new_rec_ovr(size_t id, double value, DateTime datetime, char *description, char *category, char *details)
+/*
+ * Overloaded record constructor
+ * parameter: id, unique identifier number
+ * parameter: value, monetary value
+ * parameter: datetime, data of datetime format
+ * parameter: description, item description
+ * parameter: category_id, item category
+ * parameter: details, item details
+ * return: record filled with data provided by parameters
+ */
+record* new_record_overloaded(size_t id, double value, DateTime datetime, char* description, size_t category_id, char* details)
 {
-    rec *newItem = new_rec();
-    newItem->datetime = datetime;
-    strncpy(newItem->description, description, MAX_DESCRIPTION);
-    strncpy(newItem->category, category, MAX_CATEGORY);
-    strncpy(newItem->details, details, MAX_DETAILS);
-    newItem->value = value;
-    newItem->id = id;
-    return newItem;
+    record* new_item = new_record();
+    new_item->datetime = datetime;
+    strncpy(new_item->description, description, MAX_DESCRIPTION);
+    new_item->category_id = category_id;
+    strncpy(new_item->details, details, MAX_DETAILS);
+    new_item->value = value;
+    new_item->id = id;
+
+    return new_item;
 }

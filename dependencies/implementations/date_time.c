@@ -1,105 +1,220 @@
 /*
- *  This library contains a function to return date 
- *  of splitered and integer form
+ * This library contains a definition of the data type of the "DateTime" and methods to format and
+ * get data from him
+ *
+ * Author: Quemuel Alves Nassor
+ * Date: 02/05/21
  */
 
 #include <stdlib.h>
-#include <time.h>
+
 #if defined(_WIN32) || defined(WIN32)
-    #include "..\include\date_time.h"
+#include "..\include\date_time.h"
 #elif defined(__unix__)
-    #include "../include/date_time.h"
+#include "../include/date_time.h"
 #endif
 
-/* Return current datetime */
+/*
+ * Function to get current datetime
+ * return: current datetime
+ */
 DateTime now(void)
 {
-    DateTime dt;
-    time(&dt.Time_secs);
-    dt.Date = localtime(&dt.Time_secs);
-    return dt;
+    DateTime datetime;
+
+    time(&datetime.time_secs);
+    datetime.date = localtime(&datetime.time_secs);
+
+    return datetime;
 }
 
-/* Return year of datetime */
-int year(DateTime datetime)
+/*
+ * Function to get year from datetime
+ * parameter: datetime, data of datetime format
+ * return: year from datetime as string
+ */
+char* year(DateTime datetime)
+{
+    char* year = (char*)malloc(MAX_YEAR * sizeof(char));
+
+    strftime(year, MAX_YEAR, "%Y", datetime.date);
+    year[MAX_YEAR - 1] = '\0';
+
+    return year;
+}
+
+/*
+ * Function to get year number from datetime
+ * parameter: datetime, data of datetime format
+ * return: year from datetime as number
+ */
+int year_number(DateTime datetime)
 {
     char year[MAX_YEAR];
-    strftime(year, MAX_YEAR, "%Y", datetime.Date);
+
+    strftime(year, MAX_YEAR, "%Y", datetime.date);
+
     return atoi(year);
 }
 
-/* Return month name of datetime */
-char *month(DateTime datetime)
+/*
+ * Function to get month name from datetime
+ * parameter: datetime, data of datetime format
+ * return: month name from datetime
+ */
+char* month(DateTime datetime)
 {
-    char *month = (char*)malloc(MAX_MONTH*sizeof(char));
-    strftime(month, MAX_MONTH, "%B", datetime.Date);
+    char* month = (char*)malloc(MAX_MONTH * sizeof(char));
+
+    strftime(month, MAX_MONTH, "%B", datetime.date);
     month[MAX_MONTH - 1] = '\0';
+
     return month;
 }
 
-/* Return number of month of datetime */
-int month_num(DateTime datetime)
+/*
+ * Function to get number of month from datetime
+ * parameter: datetime, data of datetime format
+ * return: number of month from datetime
+ */
+int month_number(DateTime datetime)
 {
     char month[MAX_DAY];
-    strftime(month, MAX_DAY, "%m", datetime.Date);
+
+    strftime(month, MAX_DAY, "%m", datetime.date);
+
     return atoi(month);
 }
 
-/* Return day of datetime */
+/*
+ * Function to get day from datetime
+ * parameter: datetime, data of datetime format
+ * return: number of day from datetime
+ */
 int day(DateTime datetime)
 {
     char day[MAX_DAY];
-    strftime(day, MAX_DAY, "%d", datetime.Date);
+
+    strftime(day, MAX_DAY, "%d", datetime.date);
+
     return atoi(day);
 }
 
-/* Return time string of datetime */
-char *tm_str(DateTime datetime)
+/*
+ * Function to get time from datetime
+ * parameter: datetime, data of datetime format
+ * return: time from datetime as string
+ */
+char* time_only(DateTime datetime)
 {
-    char *curr_t = (char*)malloc(MAX_TIME*sizeof(char));
-    strftime(curr_t, MAX_TIME, "%X", datetime.Date);
-    curr_t[MAX_TIME - 1] = '\0';
-    return curr_t;
+    char* time = (char*)malloc(MAX_TIME * sizeof(char));
+
+    strftime(time, MAX_TIME, "%X", datetime.date);
+    time[MAX_TIME - 1] = '\0';
+
+    return time;
 }
 
-/* Return datetime string of datetime */
-char *dtm_str(DateTime datetime)
+/*
+ * Function to get datetime string from datetime
+ * parameter: datetime, data of datetime format
+ * return: datetime as string
+ */
+char* datetime_string(DateTime datetime)
 {
-    char *curr_dt = (char*)malloc(MAX_DATETIME*sizeof(char));
-    strftime(curr_dt, MAX_DATETIME, "%Y-%m-%d %X", datetime.Date);
-    curr_dt[MAX_DATETIME - 1] = '\0';
-    return curr_dt;
+    char* string_datetime = (char*)malloc(MAX_DATETIME * sizeof(char));
+
+    strftime(string_datetime, MAX_DATETIME, "%Y-%m-%d %X", datetime.date);
+    string_datetime[MAX_DATETIME - 1] = '\0';
+
+    return string_datetime;
 }
 
-/* Default datetime constructor */
-DateTime new_dtm()
+/*
+ * Function to set datetime month
+ * parameter: datetime, data of datetime format
+ * parameter: month, month number range 1 to 12
+ */
+void set_month(DateTime* datetime, int month)
 {
-    DateTime dtm;
-    dtm = now();
-    dtm.now = &now;
-    dtm.fmt_str = &dtm_str;
-
-    return dtm;
+    datetime->date->tm_mon = month - 1;
 }
 
-/* Overloaded datetime constructor */
-DateTime new_dtm_ovr(int tm_sec, int tm_min, int tm_hour, int tm_mday, int tm_mon, int tm_year, int tm_wday, int tm_yday, int tm_isdst, time_t time_secs)
+/*
+ * Function to set datetime week day
+ * parameter: datetime, data of datetime format
+ * parameter: week_day, day of the week, range 1 to 7
+ */
+void set_week_day(DateTime* datetime, int week_day)
 {
-    DateTime dtm;
-    dtm.Date = (struct tm *)malloc(sizeof(struct tm));
+    datetime->date->tm_wday = week_day - 1;
+}
 
-    dtm.Date->tm_sec = tm_sec;                      /* seconds,  range 0 to 59          */
-    dtm.Date->tm_min = tm_min;                      /* minutes, range 0 to 59           */
-    dtm.Date->tm_hour = tm_hour;                    /* hours, range 0 to 23             */
-    dtm.Date->tm_mday = tm_mday;                    /* day of the month, range 1 to 31  */
-    dtm.Date->tm_mon = tm_mon-1;                    /* month, range 1 to 12             */
-    dtm.Date->tm_year = tm_year-1900;               /* The number of years since 1900   */
-    dtm.Date->tm_wday = tm_wday-1;                  /* day of the week, range 1 to 7    */
-    dtm.Date->tm_yday = tm_yday;                    /* day in the year, range 0 to 365  */
-    dtm.Date->tm_isdst = tm_isdst;                  /* daylight saving time             */	
-    dtm.Time_secs = time_secs;                      /* The number of seconds since 1900 */
-    dtm.now = &now;
-    dtm.fmt_str = &dtm_str;
 
-    return dtm;
+/*
+ * Function to set datetime year
+ * parameter: datetime, data of datetime format
+ * parameter: year, the number of years since 1900
+ */
+void set_year(DateTime* datetime, int year)
+{
+    datetime->date->tm_year = year - 1900;
+}
+
+/*
+ * Default datetime constructor
+ * return: minimally initialized datetime
+ */
+DateTime new_datetime(void)
+{
+    DateTime datetime;
+    
+    datetime = now();
+
+    datetime.now = now;
+    datetime.format_string = datetime_string;
+    datetime.set_month = set_month;
+    datetime.set_week_day = set_week_day;
+    datetime.set_year = set_year;
+
+    return datetime;
+}
+
+/*
+ * Overloaded datetime constructor
+ * parameter: seconds, seconds,  range 0 to 59          
+ * parameter: minutes, minutes, range 0 to 59           
+ * parameter: hours, hours, range 0 to 23             
+ * parameter: month_day, day of the month, range 1 to 31  
+ * parameter: month, month, range 1 to 12             
+ * parameter: year, The number of years since 1900   
+ * parameter: week_day, day of the week, range 1 to 7    
+ * parameter: year_day, day in the year, range 0 to 365  
+ * parameter: is_dst, daylight saving time             
+ * parameter: time_seconds, the number of seconds since 1900 
+ * return: datetime filled with data provided by parameters
+ */
+DateTime new_datetime_overloaded(int seconds, int minutes, int hours, int month_day, int month, int year, int week_day, int year_day, int is_dst, time_t time_seconds)
+{
+    DateTime datetime;
+
+    datetime.date = (struct tm*)malloc(sizeof(struct tm));
+    datetime.now = now;
+    datetime.format_string = datetime_string;
+    datetime.set_month = set_month;
+    datetime.set_week_day = set_week_day;
+    datetime.set_year = set_year;
+
+    datetime.date->tm_sec = seconds;      /* seconds,  range 0 to 59          */
+    datetime.date->tm_min = minutes;      /* minutes, range 0 to 59           */
+    datetime.date->tm_hour = hours;       /* hours, range 0 to 23             */
+    datetime.date->tm_mday = month_day;   /* day of the month, range 1 to 31  */
+    set_month(&datetime, month);          /* month, range 1 to 12             */
+    set_year(&datetime, year);            /* The number of years since 1900   */
+    set_week_day(&datetime, week_day);    /* day of the week, range 1 to 7    */
+    datetime.date->tm_yday = year_day;    /* day in the year, range 0 to 365  */
+    datetime.date->tm_isdst = is_dst;     /* daylight saving time             */
+    datetime.time_secs = time_seconds;    /* the number of seconds since 1900 */
+
+    return datetime;
 }
