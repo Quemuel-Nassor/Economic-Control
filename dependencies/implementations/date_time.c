@@ -24,6 +24,12 @@ DateTime now(void)
 
     time(&datetime.time_secs);
     datetime.date = localtime(&datetime.time_secs);
+    
+    datetime.now = &now;
+    datetime.format_string = &datetime_string;
+    datetime.set_month = &set_month;
+    datetime.set_week_day = &set_week_day;
+    datetime.set_year = &set_year;
 
     return datetime;
 }
@@ -171,11 +177,11 @@ DateTime new_datetime(void)
     
     datetime = now();
 
-    datetime.now = now;
-    datetime.format_string = datetime_string;
-    datetime.set_month = set_month;
-    datetime.set_week_day = set_week_day;
-    datetime.set_year = set_year;
+    datetime.now = &now;
+    datetime.format_string = &datetime_string;
+    datetime.set_month = &set_month;
+    datetime.set_week_day = &set_week_day;
+    datetime.set_year = &set_year;
 
     return datetime;
 }
@@ -199,11 +205,11 @@ DateTime new_datetime_overloaded(int seconds, int minutes, int hours, int month_
     DateTime datetime;
 
     datetime.date = (struct tm*)malloc(sizeof(struct tm));
-    datetime.now = now;
-    datetime.format_string = datetime_string;
-    datetime.set_month = set_month;
-    datetime.set_week_day = set_week_day;
-    datetime.set_year = set_year;
+    datetime.now = &now;
+    datetime.format_string = &datetime_string;
+    datetime.set_month = &set_month;
+    datetime.set_week_day = &set_week_day;
+    datetime.set_year = &set_year;
 
     datetime.date->tm_sec = seconds;      /* seconds,  range 0 to 59          */
     datetime.date->tm_min = minutes;      /* minutes, range 0 to 59           */
