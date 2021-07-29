@@ -16,7 +16,7 @@
 #include "../include/file.h"
 #endif
 
-const char* HANDLERS[] = { "r", "r+", "rb", "rb+", "w", "w+", "wb", "wb+", "a", "a+", "ab", "ab+" };
+const char* FILE_HANDLERS[] = { "r", "r+", "rb", "rb+", "w", "w+", "wb", "wb+", "a", "a+", "ab", "ab+" };
 
 /*
  * Function to test file access
@@ -34,7 +34,7 @@ FILE* test_open(int mode, char* file_path)
     }
 
     char* filename = &strrchr(file_path, DIR_SEPARATOR_CHR)[1];
-    FILE* file_pointer = fopen(file_path, HANDLERS[mode]);
+    FILE* file_pointer = fopen(file_path, FILE_HANDLERS[mode]);
     char* msg = error_mess("Unable to open file", filename);
 
     if (file_pointer == NULL)

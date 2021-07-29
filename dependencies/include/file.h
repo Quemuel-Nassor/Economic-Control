@@ -12,10 +12,10 @@
 
 #define START_OF_FILE 0
 
-extern const char* HANDLERS[];
+extern const char* FILE_HANDLERS[];
 extern const char DIR_SEPARATOR_CHR;
 
-enum file_mode
+enum file_modes
 {
     READ,           /* read only */
     READ_WRITE,     /* read and write (the file must exist) */
