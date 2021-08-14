@@ -26,7 +26,7 @@ const char* FILE_HANDLERS[] = { "r", "r+", "rb", "rb+", "w", "w+", "wb", "wb+", 
  */
 FILE* test_open(int mode, char* file_path)
 {
-    if ((int)strlen(file_path) == 0 || file_path == NULL)
+    if (strlen(file_path) == 0 || file_path == NULL)
     {
         errno = EINVAL;
         perror("The file path entered is invalid");
@@ -96,7 +96,7 @@ char* read_file(int mode, char* file_path)
 
     setbuf(stdin, NULL);
     fgets(file_content, file_size, file_pointer);       /* reading the contents of the file */
-    file_content[(int)strlen(file_content)] = '\0';
+    file_content[strlen(file_content)] = '\0';
 
     fclose(file_pointer);
 

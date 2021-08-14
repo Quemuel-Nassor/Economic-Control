@@ -84,8 +84,8 @@ int get_parent_dir(char *path, char *parent_path)
     
     struct stat st = {0};                                         /*File structure*/
     char *last_file_or_folder = strrchr(path, DIR_SEPARATOR_CHR); /*Find and retrieve the string starting with the last character DIR_SEPARATOR_CHR*/
-    int size_parent = (last_file_or_folder != NULL ? (int)strlen(last_file_or_folder) : 0);
-    int size = (int)((int)strlen(path) - size_parent);
+    size_t size_parent = (last_file_or_folder != NULL ? strlen(last_file_or_folder) : 0);
+    size_t size = (strlen(path) - size_parent);
 
     parent_path = (char *)malloc(size * sizeof(char));
     parent_path[0] = '\0';
@@ -111,7 +111,7 @@ int mk_dir_tree(char *path)
 
     /* struct stat st = {0};                               /*File structure*/
     /* char *sep = strrchr(path, DIR_SEPARATOR_CHR);       /*Find and retrieve the string from the last character DIR_SEPARATOR_CHR*/
-    /* char new_path[(int)strlen(path)];                   /*New path without the last folder*/
+    /* char new_path[strlen(path)];                   /*New path without the last folder*/
     /* new_path[0] = '\0';*/
     /* if(sep != NULL){*/
     /*     strncpy(new_path,path,(sep-path));              /*Copy path without the last folder*/
@@ -133,12 +133,12 @@ int mk_dir_tree(char *path)
 
     if (result != EXIT_SUCCESS && errno == ENOENT)
     {
-        if((int)strlen(parent_path) != 0) mk_dir_tree(parent_path); /*Recursion call*/
+        if(strlen(parent_path) != 0) mk_dir_tree(parent_path); /*Recursion call*/
         mk_dir(path);             /*Return of recursion*/
         /* result = stat(path, &st);                       /*Testing if path is valid*/
         get_parent_dir(path, parent_path) == 0 ? errno = EXIT_SUCCESS : 0;
     }
-    else if ((result != EXIT_SUCCESS && errno != ENOENT) || (result != EXIT_SUCCESS && errno == ENOENT && (int)strlen(parent_path) == 0))
+    else if ((result != EXIT_SUCCESS && errno != ENOENT) || (result != EXIT_SUCCESS && errno == ENOENT && strlen(parent_path) == 0))
     {
         char *errorMessage = error_mess("Failed to create directory tree", path);
         perror(errorMessage);
@@ -156,7 +156,7 @@ int rm_dir_tree(char *path)
 {
 
     /* struct stat st = {0};                               /*File structure*/
-    /* char new_path[(int)strlen(path)];                        /*New path without the last folder*/
+    /* char new_path[strlen(path)];                        /*New path without the last folder*/
     /* char *sep = strrchr(path, DIR_SEPARATOR_CHR);       /*Find and retrieve the string from the last character DIR_SEPARATOR_CHR*/
     /* new_path[0] = '\0';*/
     /* if(sep != NULL){*/
@@ -171,13 +171,13 @@ int rm_dir_tree(char *path)
 
     /* int result = stat(path, &st);                       /*Testing if path is valid*/
 
-    if ((int)strlen(parent_path) != 0 && errno == ENOENT)
+    if (strlen(parent_path) != 0 && errno == ENOENT)
     {
         rm_dir_tree(parent_path);
         /* result = stat(path, &st);                       /*Testing if path is valid*/
         get_parent_dir(path, parent_path) == EXIT_FAILURE ? errno = EXIT_SUCCESS : 0;
     }
-    else if ((int)strlen(parent_path) == 0 && errno != ENOENT)
+    else if (strlen(parent_path) == 0 && errno != ENOENT)
     {
         char *errorMessage = error_mess("Failed to remove directory tree", path);
         perror(errorMessage);
@@ -232,9 +232,9 @@ int join_path(char *path, char *params,...)
     /* Iterating the parameter list */
     while ((folder_or_filename = va_arg(words, char*))!= NULL)  
     {
-        if((int)strlen(path) == PATH_MAX) break;
+        if(strlen(path) == PATH_MAX) break;
 
-        int param_size = (int)strlen(folder_or_filename);
+        size_t param_size = strlen(folder_or_filename);
 
         if(params_count >= 0 && folder_or_filename != NULL) path[strlen(path)] = DIR_SEPARATOR_CHR;
         strcat(path, folder_or_filename);
@@ -282,11 +282,11 @@ char *list_dir(char *path)
                 listContent = (char *)malloc(sizeof(lsdir->d_name) + sizeof(aux));
                 strcpy(listContent, aux);
                 strcat(listContent, lsdir->d_name);
-                listContent[(int)strlen(listContent)] = ',';
+                listContent[strlen(listContent)] = ',';
             }
         };
 
-        listContent[(int)strlen(listContent) - 1] = '\0';
+        listContent[strlen(listContent) - 1] = '\0';
     }
 
     if (errno == ENOENT || errno != 0)
@@ -295,7 +295,7 @@ char *list_dir(char *path)
         errorMessage = error_mess("Failed to list content of informed path", path);
         perror(errorMessage);
     }
-    else if ((int)strlen(listContent) == 0 && errno == 0)
+    else if (strlen(listContent) == 0 && errno == 0)
     {
         listContent = NULL;
         errno = ENODATA;
@@ -315,7 +315,8 @@ int rm_files(char *path)
 {
 
     char *listContent = list_dir(path); /*Informed directory contents*/
-    int i = 0, size = (int)strlen(listContent);
+    int i = 0;
+    size_t size = strlen(listContent);
     char name[NAME_MAX + 1] = "\0";
 
     if (errno == 0)
@@ -326,7 +327,7 @@ int rm_files(char *path)
 
             if (listContent[i] != ',' && listContent[i] != '\0')
             {
-                name[(int)strlen(name)] = listContent[i];
+                name[strlen(name)] = listContent[i];
             }
             else
             {
@@ -339,7 +340,7 @@ int rm_files(char *path)
                 {
                     remove(fullpath);
 
-                    if (errno != 0 || (strcmp(fullpath, path) == 0 || (int)strlen(name) == 0))
+                    if (errno != 0 || (strcmp(fullpath, path) == 0 || strlen(name) == 0))
                     {
                         i = size + 1;
                         char *errorMessage = error_mess("Failed to clean item", fullpath);
@@ -357,7 +358,7 @@ int rm_files(char *path)
         }
     }
 
-    if ((int)strlen(path) == 0 || errno != 0)
+    if (strlen(path) == 0 || errno != 0)
     {
         char *errorMessage = error_mess("Failed to clean items of informed path", path);
         perror(errorMessage);
@@ -382,9 +383,10 @@ int rm_all(char *path)
 
     /* struct stat st = {0};                               /*File structure*/
     char *listContent = list_dir(path), *parent; /*Informed directory contents*/
-    int i = 0, size = 0;
+    int i = 0;
+    size_t size = 0;
     char name[NAME_MAX + 1] = "\0";
-    size = listContent != NULL ? (int)strlen(listContent) : 0;
+    size = listContent != NULL ? strlen(listContent) : 0;
 
     /* printf("\nconteudo do diretorio {%s}", listContent);*/
     /* printf("\nsize {%i}", size);*/
@@ -411,7 +413,7 @@ int rm_all(char *path)
 
             if (listContent[i] != ',' && listContent[i] != '\0')
             {
-                name[(int)strlen(name)] = listContent[i];
+                name[strlen(name)] = listContent[i];
             }
             else
             {
@@ -441,7 +443,7 @@ int rm_all(char *path)
                     /**/
                     /* remove(fullpath);*/
 
-                    if (errno != 0 || (strcmp(fullpath, path) == 0 || (int)strlen(name) == 0))
+                    if (errno != 0 || (strcmp(fullpath, path) == 0 || strlen(name) == 0))
                     {
                         i = size + 1;
                         char *errorMessage = error_mess("Failed to clean item", fullpath);
@@ -458,7 +460,7 @@ int rm_all(char *path)
         }
     }
 
-    if ((int)strlen(path) == 0 || errno != 0)
+    if (strlen(path) == 0 || errno != 0)
     {
         printf("errno {%i}", errno);
         char *errorMessage = error_mess("Failed to clean items of informed path", path);

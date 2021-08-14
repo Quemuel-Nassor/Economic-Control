@@ -24,8 +24,8 @@
  */
 char* error_mess(char* msg, char* param)
 {
-    int sizeMsg = (int)strlen(msg);
-    int sizeParam = (int)strlen(param);
+    size_t sizeMsg = strlen(msg);
+    size_t sizeParam = strlen(param);
     char* errorMessage = (char*)malloc(MAX_ERROR_MESS * sizeof(char));
 
     if ((msg == NULL || sizeMsg == 0) && (param == NULL || sizeParam == 0))
