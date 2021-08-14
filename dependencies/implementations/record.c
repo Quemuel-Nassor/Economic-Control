@@ -23,7 +23,7 @@
 void show_record(record* item)
 {
     printf("          Id: %li\n", item->id);
-    printf("          Date: %s\n", item->datetime.format_string(item->datetime));
+    printf("          Date: %s\n", item->datetime.format_string(item->datetime,DATETIME));
     printf("          Category id: %li\n", item->category_id);
     printf("          Description: %s\n", item->description);
     printf("          Value: %.2Lf\n", item->value);
