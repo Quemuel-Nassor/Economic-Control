@@ -1,5 +1,7 @@
 ﻿#remove unwanted commit files
 /Database/*
+/.vscode/*
+/dependencies/lib/*
 *.exe
 *.ini
 *.txt
