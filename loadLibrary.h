@@ -200,7 +200,7 @@ void saveListAsTxt(record *recList, FILE *dataBase, char path[30]){
 	while(recList != NULL){
 		
 		fprintf(dataBase,"%lu\t",recList->id);
-		fprintf(dataBase,"%s\t",recList->datetime.format_string(recList->datetime));
+		fprintf(dataBase,"%s\t",recList->datetime.format_string(recList->datetime,DATABASE_UTC));
 		fprintf(dataBase,"%Lf\t",recList->value);
 		fprintf(dataBase,"%lu\t",recList->category_id);
 		fprintf(dataBase,"%s\t",recList->description);
@@ -242,7 +242,7 @@ void saveListAsJson(record *recList, FILE *dataBase, char path[30]){
 		fprintf(dataBase,"%c",'"');
 		fprintf(dataBase,"%s"," : ");
 		fprintf(dataBase,"%c",'"');
-		fprintf(dataBase,"%s",recList->datetime.format_string(recList->datetime));
+		fprintf(dataBase,"%s",recList->datetime.format_string(recList->datetime,DATABASE_UTC));
 		fprintf(dataBase,"%c",'"');
 		fprintf(dataBase,"%c",',');
 		
@@ -359,13 +359,13 @@ void switchDataBase(void){
 	printf("Select a month\n\n");
 
 	DateTime display = new_datetime();
-	display.date->tm_mon = option-1;
+	display.set_month(&display,option-1);
 
 	//loop to display and select months
 	for(i=JANUARY;i<DECEMBER;i++){
-		display.date->tm_mon = i;
+		display.set_month(&display,i);
 		i <= 8 ? printf(" ") : 0;
-		printf("   %i - %s\n",i,month(display));
+		printf("   %i - %s\n",i,display.format_string(display,MONTH));
 	}
 
 	//Get selected option
@@ -376,8 +376,8 @@ void switchDataBase(void){
 	display.date->tm_mon = option-1;
 		
 	//Checking if is currente or other
-	if(strcmp(currentMonth,month(display)) != 0){
-		strcpy(currentMonth, option-1 > 12 || option-1 < 0 ? currentMonth : month(display));
+	if(strcmp(currentMonth, display.format_string(display,MONTH)) != 0){
+		strcpy(currentMonth, option-1 > 12 || option-1 < 0 ? currentMonth : display.format_string(display,MONTH));
 	}
 	
 	//Creating path to data base
@@ -409,13 +409,13 @@ void checkYearsPath(void){
 	while(fscanf(yearList,"%s",itemResult) != EOF){
 
 		//Add current year in file if don't exist
-		if(atoi(itemResult) == EOF && atoi(itemResult) == year_number(dtm)){
+		if(atoi(itemResult) == EOF && atoi(itemResult) == get_value(dtm.format_string(dtm,YEAR))){
 			
 			//Write the current year in the file
-			fprintf(yearList,"%s",year(dtm));
+			fprintf(yearList,"%s",dtm.format_string(dtm,YEAR));
 			fprintf(yearList,"%c",'\n');
 			
-		}else if (atoi(itemResult) != EOF && atoi(itemResult) == year_number(dtm)){
+		}else if (atoi(itemResult) != EOF && atoi(itemResult) == get_value(dtm.format_string(dtm,YEAR))){
 			
 			break;
 		}
@@ -448,7 +448,7 @@ void checkDatabase(void){
 	// snprintf(y_str,5,"%d",year_number(dtm));
 
 	//Creating path to data base
-	strcat(basePath,year(dtm));
+	strcat(basePath,dtm.format_string(dtm,YEAR));
 	// strcat(basePath,(char*)DIR_SEPARATOR_CHR);
 	basePath[strlen(basePath)-1] = DIR_SEPARATOR_CHR;
 	
@@ -473,7 +473,7 @@ void checkDatabase(void){
 		fclose(dataBase);
 		
 		//Concatenate current month
-		strcat(basePath,month(dtm));
+		strcat(basePath,dtm.format_string(dtm,MONTH));
 		strcpy(filePathTxt,basePath);
 		strcpy(filePathJson,basePath);
 		
@@ -489,7 +489,7 @@ void checkDatabase(void){
 		yearList = fopen(yearsPath,"a");
 		
 		//Write the current year in the file
-			fprintf(yearList,"%s",year(dtm));
+			fprintf(yearList,"%s",dtm.format_string(dtm,YEAR));
 			fprintf(yearList,"%c",'\n');
 		
 		//Close the file
@@ -499,7 +499,7 @@ void checkDatabase(void){
 	}else{
 		
 		//Concatenate current month
-		strcat(basePath,month(dtm));
+		strcat(basePath,dtm.format_string(dtm,MONTH));
 	}
 	
 	checkYearsPath();
@@ -517,7 +517,7 @@ void checkDatabase2(){
 		mk_dir_tree(db_path);
 
 		char content_to_write[17] = "[{\"year\": ";
-		strcat(content_to_write, year(dtm));
+		strcat(content_to_write, dtm.format_string(dtm,YEAR));
 		strcat(content_to_write, "}]\0");
 
 		write_file(content_to_write, WRITE, db_index_path);
@@ -529,7 +529,7 @@ void checkDatabase2(){
 
 		strncpy(content, read_file(READ, db_index_path), size-17);
 		strcat(content, ",{\"year\": ");
-		strcat(content, year(dtm));
+		strcat(content, dtm.format_string(dtm,YEAR));
 		strcat(content, "}]\0");
 
 		write_file(content, WRITE, db_index_path);

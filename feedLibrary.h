@@ -174,7 +174,7 @@ void dataFeed(record *recsList){
 	//Clean screen and display data
 	ClrScr();
 	HEADER();
-	printf("Date: %s",recsList->datetime.format_string(recsList->datetime));
+	printf("Date: %s",recsList->datetime.format_string(recsList->datetime,DATETIME));
 	printf("\nDescription: %s",recsList->description);
 	// printf("\nCategory: %s",recsList->category);
 					
@@ -198,7 +198,7 @@ void dataFeed(record *recsList){
 	//Clean screen and display data
 	ClrScr();
 	HEADER();
-	printf("Date: %s",recsList->datetime.format_string(recsList->datetime));
+	printf("Date: %s",recsList->datetime.format_string(recsList->datetime,DATETIME));
 	printf("\nDescription: %s",recsList->description);
 	// printf("\nCategory: %s",recsList->category);
 	printf("\nValue: %.2Lf",recsList->value);
