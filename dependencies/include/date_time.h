@@ -55,7 +55,7 @@ enum datetime_formats
     WEEK_START_MONDAY_ZERO,  /* (%W) week number with the first Monday as the first day of week one (00-53) */
     WEEK_START_ONE,          /* (%V) week number (01-53) (ISO 8601) */
     SHORT_MONTH_NAME,        /* (%b) abbreviated month name */
-    FULL_MONTH_NAME,         /* (%B) full month name */
+    MONTH_NAME,              /* (%B) full month name */
     MONTH,                   /* (%m) month as a decimal number (01-12) */
     SHORT_YEAR_ROUNDED,      /* (%C) year divided by 100 and truncated to integer (00-99) */
     SHORT_YEAR,              /* (%y) year, last two digits (00-99) */
@@ -90,7 +90,7 @@ char* datetime_format(DateTime datetime, int format);
 void set_month(DateTime* datetime, int month);
 void set_week_day(DateTime* datetime, int week_day);
 void set_year(DateTime* datetime, int year);
-DateTime datetime_from(char *string_datetime);
+// DateTime datetime_from(char *string_datetime);
 DateTime new_datetime(void);
 DateTime new_datetime_overloaded(int seconds, int minutes, int hours, int month_day, int month, int year, int week_day, int year_day, int is_dst);
 
