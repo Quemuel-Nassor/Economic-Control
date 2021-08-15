@@ -398,12 +398,12 @@ int rm_all(char *path)
     {
         rm_files(path); /*cleaning files from current dir*/
         /* listContent = LIST_DIR(path);*/
-        printf("\nremovendo arquivos do diretorio {%s}\0", path);
+        printf("\nremovendo arquivos do diretorio {%s}", path);
         setbuf(stdin, NULL);
         getchar();
     }
 
-    printf("\nremoveu os arquivos\0");
+    printf("\nremoveu os arquivos");
 
     if ((errno == 0 || errno == ENODATA) && size > 0)
     {
