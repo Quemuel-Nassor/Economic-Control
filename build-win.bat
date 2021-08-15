@@ -2,7 +2,6 @@ echo -e "\n\nCompiling libraries\n"
 set gcc=C:\MinGW\mingw64\bin\gcc.exe
 
 del .\dependencies\lib\windows /F /S /Q
-del .\dependencies\lib\linux /F /S /Q
 
 %gcc% -c .\dependencies\implementations\error.c -o .\dependencies\lib\windows\error.o
 %gcc% -c .\dependencies\implementations\string_handler.c -o .\dependencies\lib\windows\string_handler.o

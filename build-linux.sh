@@ -3,7 +3,6 @@ echo -e "\n\nCompiling libraries\n"
 gcc=C:/cygwin64/bin/gcc.exe
 
 rm ./dependencies/lib/linux/* -f -r -d
-rm ./dependencies/lib/windows/* -f -r -d
 
 gcc -c ./dependencies/implementations/error.c -o ./dependencies/lib/linux/error.o
 gcc -c ./dependencies/implementations/string_handler.c -o ./dependencies/lib/linux/string_handler.o
