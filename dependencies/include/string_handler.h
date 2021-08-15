@@ -12,6 +12,6 @@
 #define EMPTY_SEPARATOR '\0'
 
 char* string_join(long max_length, char separator, char* parameter, ...);
-char** string_split(char* separator, char* content, int *size);
+// char** string_split(char* separator, char* content, int* size);
 
 #endif

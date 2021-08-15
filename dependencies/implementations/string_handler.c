@@ -67,18 +67,38 @@ char* string_join(long max_length, char separator, char* parameter, ...)
  * parameter: size, reference to return the size of the resulting string list
  * return: string list, divided by separator character
  */
-char** string_split(char* separator, char* content, int* size)
-{
-    char** list_strings = (char**)malloc(sizeof(char*));
-    char* substring = strtok(content, separator);                              /* move pointer to last substring */
+// char** string_split(char* separator, char* content, int* size)
+// {
+//     char** list_strings;// = (char**)malloc(sizeof(char*));
+//     char* content_copy = (char*)malloc(sizeof(char)*strlen(content));
+//     char* substring;
 
-    for (*size = 0; substring != NULL;* size += 1) {
-        if (size > 0)
-            strcat(list_strings, (char**)malloc(sizeof(char*)));               /* allocate space for new element in list */
-        list_strings[*size] = (char*)malloc(sizeof(char) * strlen(substring)); /* allocate space for the string in the new position of the list */
-        strcpy(list_strings[*size], substring);                                /* add string to list */
-        substring = strtok(NULL, separator);                                   /* move pointer to last substring */
-    }
+//     strcpy(content_copy,content);                                              /* copy string content */
+//     substring = strtok(content_copy, separator);                               /* move pointer to last substring */
 
-    return list_strings;
-}
+//     /* Loop to count substrings */
+//     for (*size = 0; substring != NULL; *size+=1)
+//     {
+//         substring = strtok(NULL, separator);
+//     }
+
+//     list_strings = (char**)malloc(sizeof(char*)*(*size));                      /* allocate string list result */
+//     substring = strtok(content, separator);                                    /* move pointer to last substring */
+    
+//     /* Loop to add substrings into list */
+//     for (*size = 0; substring != NULL;* size += 1) {
+//         list_strings[*size] = (char*)malloc(sizeof(char) * strlen(substring)); /* allocate space for the string in the new position of the list */
+//         strcpy(list_strings[*size], substring);                                /* add string to list */
+//         substring = strtok(NULL, separator);                                   /* move pointer to last substring */
+//     }
+
+//     // for (*size = 0; substring != NULL;* size += 1) {
+//     //     if (size > 0)
+//     //         strcat(list_strings, (char**)malloc(sizeof(char*)));               /* allocate space for new element in list */
+//     //     list_strings[*size] = (char*)malloc(sizeof(char) * strlen(substring)); /* allocate space for the string in the new position of the list */
+//     //     strcpy(list_strings[*size], substring);                                /* add string to list */
+//     //     substring = strtok(NULL, separator);                                   /* move pointer to last substring */
+//     // }
+
+//     return list_strings;
+// }
