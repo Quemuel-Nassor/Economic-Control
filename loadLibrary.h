@@ -8,9 +8,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "dir_mgmt.h"
-#include "date_time.h"
-#include "file.h"
+#include <limits.h>
+#include "dependencies/include/dir_mgmt.h"
+#include "dependencies/include/date_time.h"
+#include "dependencies/include/string_handler.h"
+#include "dependencies/include/file.h"
 
 //Constants
 #define L 1000
@@ -437,7 +439,7 @@ void checkDatabase(void){
 	
 	//Creating path to list years
 	// strcat(basePath,(char*)DIR_SEPARATOR_CHR);
-	basePath[strlen(basePath)-1] = DIR_SEPARATOR_CHR;
+	basePath[strlen(basePath)] = DIR_SEPARATOR_CHR;
 	strcpy(yearsPath,basePath);
 	strcat(yearsPath,"list_years.txt");
 	
@@ -450,7 +452,7 @@ void checkDatabase(void){
 	//Creating path to data base
 	strcat(basePath,dtm.format_string(dtm,YEAR));
 	// strcat(basePath,(char*)DIR_SEPARATOR_CHR);
-	basePath[strlen(basePath)-1] = DIR_SEPARATOR_CHR;
+	basePath[strlen(basePath)] = DIR_SEPARATOR_CHR;
 	
 	//Creating path to check if a data base exists
 	strcpy(dataBaseFileCheck,basePath);
@@ -460,7 +462,7 @@ void checkDatabase(void){
 	if((dataBase = fopen(dataBaseFileCheck,"rb")) == NULL){
         
 		//Creating directory to data base
-		// ___mkdir("Database");
+		mk_dir("Database");
 		// ___mkdir(basePath);
 
 		mk_dir(basePath);
@@ -473,7 +475,7 @@ void checkDatabase(void){
 		fclose(dataBase);
 		
 		//Concatenate current month
-		strcat(basePath,dtm.format_string(dtm,MONTH));
+		strcat(basePath,dtm.format_string(dtm,MONTH_NAME));
 		strcpy(filePathTxt,basePath);
 		strcpy(filePathJson,basePath);
 		
@@ -505,47 +507,65 @@ void checkDatabase(void){
 	checkYearsPath();
 }
 
+
+typedef struct year
+{
+    struct year* prev;
+    struct year* next;
+	size_t id;
+	int year;
+} YearRecord;
+
 void checkDatabase2(){
-	DateTime dtm = now();
-	char db_path[PATH_MAX]="\0", db_index_path[PATH_MAX]="\0";
+	DateTime dtm = new_datetime();
+	char db_path[PATH_MAX]="\0", db_index_path[PATH_MAX]="\0", db_years_path[PATH_MAX]="\0";
+	char *content = "\0";
+
+	YearRecord *yearsList = (YearRecord*)malloc(sizeof(YearRecord));
+	yearsList->id = 1;
+	yearsList->year = get_value(dtm.format_string(dtm,YEAR));
 	
 	join_path(db_path, "Database", NULL);
 	join_path(db_index_path, "Database", "db_index.json", NULL);
-		
+	join_path(db_years_path, "Database", dtm.format_string(dtm,YEAR), NULL);
+
+	/* Checks and manages the database directory */	
 	if(check_if_dir_exist(db_path) != EXIT_SUCCESS)
 	{
 		mk_dir_tree(db_path);
-
-		char content_to_write[17] = "[{\"year\": ";
-		strcat(content_to_write, dtm.format_string(dtm,YEAR));
-		strcat(content_to_write, "}]\0");
-
-		write_file(content_to_write, WRITE, db_index_path);
+		content = string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,"[{\"id\": ",yearsList->id,",\"year\": ",yearsList->year,"}]",NULL);
 	}
 	else
 	{
 		int size = get_file_size(db_index_path) + 16;
-		char content[size];
-
+		content = (char*)malloc(sizeof(char)*size);
 		strncpy(content, read_file(READ, db_index_path), size-17);
-		strcat(content, ",{\"year\": ");
-		strcat(content, dtm.format_string(dtm,YEAR));
-		strcat(content, "}]\0");
-
-		write_file(content, WRITE, db_index_path);
+		strcat(content,string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,",{\"id\": ",yearsList->id,",\"year\": ",yearsList->year,"}]",NULL));
 	}
-	// char year_str[5], *filename = month(dtm);
-	// strcat(filename,".json");
-	// sprintf(year_str,"%i",year(dtm));
 
-	// join_path(db_path,year_str,NULL);
-	// check_if_dir_exist(db_path);
-	// mk_dir_tree(db_path);
-	// join_path(db_path,filename,NULL);
-	// // printf("%s",db_path);
-	// dataBase = fopen(db_path,"w");
-	// // fprintf(dataBase,"[{\"year\": %i}]",year(dtm));
-	// fclose(dataBase);
+	write_file(content, WRITE, db_index_path);
+	free(content);
+	
+	/* Check and manage dabatase index files */	
+	if(check_if_dir_exist(db_years_path) != EXIT_SUCCESS)
+	{
+		mk_dir_tree(db_years_path);
+		join_path(db_years_path,strcat(dtm.format_string(dtm,MONTH_NAME),".json"),NULL);
+		content = (char*)malloc(sizeof(char));
+		strcpy(content,"\0");
+	}
+	else
+	{
+		join_path(db_years_path,strcat(dtm.format_string(dtm,MONTH_NAME),".json"),NULL);
+		int size = get_file_size(db_years_path) + 16;
+		strncpy(content, read_file(READ, db_years_path), size-17);
+		strcat(content,string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,",{\"year\": ",dtm.format_string(dtm,YEAR),"}]",NULL));
+	}
+
+	write_file(content, WRITE, db_years_path);
+	free(content);
+
+	
 
 }
 
