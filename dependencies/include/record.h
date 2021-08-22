@@ -43,6 +43,7 @@ record* remove_start(record* list);
 record* remove_middle(record* list);
 void remove_end(record* list);
 void clean_list(record* list);
+char *serialize_to_json(record *list);
 record* new_record(void);
 record* new_record_overloaded(size_t id, double value, DateTime datetime, char* description, size_t category_id, char* details);
 

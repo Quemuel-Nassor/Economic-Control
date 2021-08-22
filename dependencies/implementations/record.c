@@ -12,8 +12,10 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #include "..\include\record.h"
+#include "..\include\string_handler.h"
 #elif defined(__unix__)
 #include "../include/record.h"
+#include "../include/string_handler.h"
 #endif
 
 /*
@@ -182,6 +184,58 @@ void clean_list(record* list)
 }
 
 /*
+ * Function to serialize all record of list as json string
+ * return: serialized json string
+ */
+char *serialize_to_json(record *list)
+{
+    char *json_result = (char*)malloc(sizeof(char)*2);
+    strcpy(json_result,"\0");
+    record *element = navigate_to_start(list);
+        
+    for(element; element != NULL; element = element->next)
+    {
+        int size_id = snprintf( NULL, 0, "%li", element->id ) + 1;
+        int size_category = snprintf( NULL, 0, "%li", element->category_id ) + 1;
+        int size_value = snprintf( NULL, 0, "%Lf", element->value ) + 1;
+        size_t size = DATETIME_MAX_LENGTH + MAX_DESCRIPTION + MAX_DETAILS + size_id + size_category + size_value + strlen(json_result) + 77;
+        
+        char *id = (char*)malloc(sizeof(char)*size_id);
+        char *category = (char*)malloc(sizeof(char)*size_category);
+        char *value = (char*)malloc(sizeof(char)*size_value);
+
+        sprintf(id, "%li", element->id);
+        id[strlen(id)] = '\0';
+        sprintf(category, "%li", element->category_id);
+        category[strlen(category)] = '\0';
+        sprintf(value, "%Lf", element->value);
+        value[strlen(value)] = '\0';
+        
+        char* aux = json_result;
+        json_result = (char*)malloc(sizeof(char)*size);
+        strcpy(json_result,aux);
+
+        strcat(json_result,string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,
+        ( element->prev == NULL ? "[{" : ",{"),
+        "\"Id\":",id,
+        ",\"Description\":\"",element->description,
+        "\",\"Category_id\":",category,
+        ",\"Details\":\"",element->details,
+        "\",\"Datetime\":\"",element->datetime.format_string(element->datetime,DATABASE_UTC),
+        "\",\"Value\":",value,
+        (element->next == NULL ? "}]" : "}"),NULL));
+    
+        free(id);
+        free(aux);
+        free(value);
+        free(category);
+
+    }
+
+    return json_result;
+}
+
+/*
  * Default record constructor
  * return: minimally initialized registry
  */
@@ -212,10 +266,15 @@ record* new_record(void)
 record* new_record_overloaded(size_t id, double value, DateTime datetime, char* description, size_t category_id, char* details)
 {
     record* new_item = new_record();
+
     new_item->datetime = datetime;
+    
     strncpy(new_item->description, description, MAX_DESCRIPTION);
-    new_item->category_id = category_id;
+    new_item->description[strlen(new_item->description)] = '\0';
     strncpy(new_item->details, details, MAX_DETAILS);
+    new_item->details[strlen(new_item->details)] = '\0';
+
+    new_item->category_id = category_id;
     new_item->value = value;
     new_item->id = id;
 
