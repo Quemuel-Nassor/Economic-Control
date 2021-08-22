@@ -10,6 +10,10 @@
 
 #include <limits.h>
 
+#if defined(__unix__) && !defined(PATH_MAX)
+    #include <linux/limits.h>
+#endif
+
 #ifndef NAME_MAX
 #define NAME_MAX 255
 #endif

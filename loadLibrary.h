@@ -9,6 +9,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
+
+#if defined(__unix__) && !defined(PATH_MAX)
+    #include <linux/limits.h>
+#endif
 #include "dependencies/include/dir_mgmt.h"
 #include "dependencies/include/date_time.h"
 #include "dependencies/include/string_handler.h"

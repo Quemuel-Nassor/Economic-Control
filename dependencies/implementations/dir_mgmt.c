@@ -23,6 +23,10 @@
     const char DIR_SEPARATOR_CHR = '/';
 #endif
 
+#if defined(__unix__) && !defined(PATH_MAX)
+    #include <linux/limits.h>
+#endif
+
 /*
     Function to check if directory exist
         parameter: path, path to check
