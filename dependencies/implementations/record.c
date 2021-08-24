@@ -24,9 +24,9 @@
  */
 void show_record(record* item)
 {
-    printf("          Id: %li\n", item->id);
+    printf("          Id: %lu\n", item->id);
     printf("          Date: %s\n", item->datetime.format_string(item->datetime,DATETIME));
-    printf("          Category id: %li\n", item->category_id);
+    printf("          Category id: %lu\n", item->category_id);
     printf("          Description: %s\n", item->description);
     printf("          Value: %.2Lf\n", item->value);
     printf("          Details: %s\n", item->details);
@@ -191,29 +191,45 @@ char *serialize_to_json(record *list)
 {
     char *json_result = (char*)malloc(sizeof(char)*2);
     strcpy(json_result,"\0");
-    record *element = navigate_to_start(list);
+    record *element;
         
-    for(element; element != NULL; element = element->next)
+    for(element = navigate_to_start(list); element != NULL; element = element->next)
     {
-        int size_id = snprintf( NULL, 0, "%li", element->id ) + 1;
-        int size_category = snprintf( NULL, 0, "%li", element->category_id ) + 1;
+        int size_id = snprintf( NULL, 0, "%lu", element->id ) + 1;
+        int size_category = snprintf( NULL, 0, "%lu", element->category_id ) + 1;
         int size_value = snprintf( NULL, 0, "%Lf", element->value ) + 1;
         size_t size = DATETIME_MAX_LENGTH + MAX_DESCRIPTION + MAX_DETAILS + size_id + size_category + size_value + strlen(json_result) + 77;
         
-        char *id = (char*)malloc(sizeof(char)*size_id);
-        char *category = (char*)malloc(sizeof(char)*size_category);
-        char *value = (char*)malloc(sizeof(char)*size_value);
+        char id[size_id];
+        char category[size_category];
+        char value[size_value];
 
-        sprintf(id, "%li", element->id);
-        id[strlen(id)] = '\0';
-        sprintf(category, "%li", element->category_id);
-        category[strlen(category)] = '\0';
+        sprintf(id, "%lu", element->id);
+        sprintf(category, "%lu", element->category_id);
         sprintf(value, "%Lf", element->value);
+
+        id[strlen(id)] = '\0';
+        category[strlen(category)] = '\0';
         value[strlen(value)] = '\0';
         
-        char* aux = json_result;
-        json_result = (char*)malloc(sizeof(char)*size);
-        strcpy(json_result,aux);
+        printf("id: %s - %i - %i\n\n",id,size_id,strlen(id));
+        printf("category: %s - %i - %i\n\n",category,size_category,strlen(category));
+        printf("value: %s - %i - %i\n\n",value,size_value,strlen(value));
+
+        // printf("\n\n%s\n\n\n",string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,
+        // ( element->prev == NULL ? "[{" : ",{"),
+        // "\"Id\":",id,
+        // ",\"Description\":\"",element->description,
+        // "\",\"Category_id\":",category,
+        // ",\"Details\":\"",element->details,
+        // "\",\"Datetime\":\"",element->datetime.format_string(element->datetime,DATABASE_UTC),
+        // "\",\"Value\":",value,
+        // (element->next == NULL ? "}]" : "}"),NULL));
+
+        char* realocated_json_result = (char*)realloc(json_result, sizeof(char)*size);
+        if(realocated_json_result != NULL){
+          json_result = realocated_json_result;
+        }
 
         strcat(json_result,string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,
         ( element->prev == NULL ? "[{" : ",{"),
@@ -225,11 +241,6 @@ char *serialize_to_json(record *list)
         "\",\"Value\":",value,
         (element->next == NULL ? "}]" : "}"),NULL));
     
-        free(id);
-        free(aux);
-        free(value);
-        free(category);
-
     }
 
     return json_result;
