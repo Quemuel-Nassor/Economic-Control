@@ -32,8 +32,10 @@ char* string_join(long max_length, char separator, char* parameter, ...)
     va_start(parameters_list, parameter);                   /* set pointer to first parameter on parameter list */
 
     /* Iterating the parameter list */
-    while ((string = va_arg(parameters_list, char*)) != NULL) {
-        if (max_length > INDEFINITE_LENGTH && strlen(joined_strings) + strlen(string) >= max_length) {
+    while ((string = va_arg(parameters_list, char*)) != NULL)
+    {
+        if (max_length > INDEFINITE_LENGTH && strlen(joined_strings) + strlen(string) >= max_length)
+        {
             va_end(parameters_list);                        /* set pointer of parameter list to NULL */
             joined_strings[strlen(joined_strings)] = '\0';  /* set termination string character */
             return joined_strings;
@@ -42,12 +44,16 @@ char* string_join(long max_length, char separator, char* parameter, ...)
         /*
          *  Resize result string
          */
-        char* aux = joined_strings;
-        joined_strings = (char*)malloc(sizeof(char) * (strlen(joined_strings) + strlen(string)));
-        strcpy(joined_strings, aux);
-        free(aux);
+        size_t new_size = (strlen(joined_strings) + strlen(string));
 
-        if (string != NULL) {
+        char* aux = (char*)realloc(joined_strings, sizeof(char) * new_size);
+        if (aux != NULL)
+        {
+            joined_strings = aux;
+        }
+
+        if (string != NULL)
+        {
             if (separator != EMPTY_SEPARATOR)
                 joined_strings[strlen(joined_strings)] = separator; /* set separator character */
             strcat(joined_strings, string);
@@ -84,7 +90,7 @@ char* string_join(long max_length, char separator, char* parameter, ...)
 
 //     list_strings = (char**)malloc(sizeof(char*)*(*size));                      /* allocate string list result */
 //     substring = strtok(content, separator);                                    /* move pointer to last substring */
-    
+
 //     /* Loop to add substrings into list */
 //     for (*size = 0; substring != NULL;* size += 1) {
 //         list_strings[*size] = (char*)malloc(sizeof(char) * strlen(substring)); /* allocate space for the string in the new position of the list */
