@@ -67,6 +67,40 @@ char* string_join(long max_length, char separator, char* parameter, ...)
 }
 
 /*
+ * Function to convert any value to string
+ * parameter: value, number to convert
+ * parameter: format, format specifier, %li to integer or %Lf to double
+ */
+char* to_string(void* value, const char* format)
+{
+    int value_size;
+    if (strcmp(format, "%Lf") == 0)
+    {
+        value_size = snprintf(NULL, 0, format, (long double*)value) + 1;
+    }
+    else
+    {
+        value_size = snprintf(NULL, 0, format, (size_t*)value) + 1;
+    }
+
+    char* string_value = (char*)malloc(sizeof(char) * value_size);
+    strcpy(string_value, "\0");
+
+    if (strcmp(format, "%Lf") == 0)
+    {
+        sprintf(string_value, format, (long double*)value);
+    }
+    else
+    {
+        sprintf(string_value, format, (size_t*)value);
+    }
+
+    strcat(string_value, "\0");
+
+    return string_value;
+}
+
+/*
  * Function to split a string based on the separator parameter
  * parameter: separator, separator character
  * parameter: content, string to split
