@@ -195,36 +195,11 @@ char *serialize_to_json(record *list)
         
     for(element = navigate_to_start(list); element != NULL; element = element->next)
     {
-        int size_id = snprintf( NULL, 0, "%lu", element->id ) + 1;
-        int size_category = snprintf( NULL, 0, "%lu", element->category_id ) + 1;
-        int size_value = snprintf( NULL, 0, "%Lf", element->value ) + 1;
-        size_t size = DATETIME_MAX_LENGTH + MAX_DESCRIPTION + MAX_DETAILS + size_id + size_category + size_value + strlen(json_result) + 77;
-        
-        char id[size_id];
-        char category[size_category];
-        char value[size_value];
+        char *id = to_string(&element->id,"%lu");
+        char *category = to_string(&element->category_id,"%lu");
+        char *value = to_string(&element->value,"%Lf");
 
-        sprintf(id, "%lu", element->id);
-        sprintf(category, "%lu", element->category_id);
-        sprintf(value, "%Lf", element->value);
-
-        id[strlen(id)] = '\0';
-        category[strlen(category)] = '\0';
-        value[strlen(value)] = '\0';
-        
-        printf("id: %s - %i - %i\n\n",id,size_id,strlen(id));
-        printf("category: %s - %i - %i\n\n",category,size_category,strlen(category));
-        printf("value: %s - %i - %i\n\n",value,size_value,strlen(value));
-
-        // printf("\n\n%s\n\n\n",string_join(INDEFINITE_LENGTH,EMPTY_SEPARATOR,
-        // ( element->prev == NULL ? "[{" : ",{"),
-        // "\"Id\":",id,
-        // ",\"Description\":\"",element->description,
-        // "\",\"Category_id\":",category,
-        // ",\"Details\":\"",element->details,
-        // "\",\"Datetime\":\"",element->datetime.format_string(element->datetime,DATABASE_UTC),
-        // "\",\"Value\":",value,
-        // (element->next == NULL ? "}]" : "}"),NULL));
+        size_t size = DATETIME_MAX_LENGTH + MAX_DESCRIPTION + MAX_DETAILS + strlen(id) + strlen(category) + strlen(value) + strlen(json_result) + 77;
 
         char* realocated_json_result = (char*)realloc(json_result, sizeof(char)*size);
         if(realocated_json_result != NULL){
@@ -240,7 +215,7 @@ char *serialize_to_json(record *list)
         "\",\"Datetime\":\"",element->datetime.format_string(element->datetime,DATABASE_UTC),
         "\",\"Value\":",value,
         (element->next == NULL ? "}]" : "}"),NULL));
-    
+
     }
 
     return json_result;
