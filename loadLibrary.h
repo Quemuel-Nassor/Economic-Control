@@ -207,7 +207,7 @@ void saveListAsTxt(record *recList, FILE *dataBase, char path[30]){
 		
 		fprintf(dataBase,"%lu\t",recList->id);
 		fprintf(dataBase,"%s\t",recList->datetime.format_string(recList->datetime,DATABASE_UTC));
-		fprintf(dataBase,"%Lf\t",recList->value);
+		fprintf(dataBase,"%lf\t",recList->value);
 		fprintf(dataBase,"%lu\t",recList->category_id);
 		fprintf(dataBase,"%s\t",recList->description);
 		fprintf(dataBase,"%s\n",recList->details);
@@ -256,7 +256,7 @@ void saveListAsJson(record *recList, FILE *dataBase, char path[30]){
 		fprintf(dataBase,"%s","value");
 		fprintf(dataBase,"%c",'"');
 		fprintf(dataBase,"%s"," : ");
-		fprintf(dataBase,"%Lf",recList->value);
+		fprintf(dataBase,"%lf",recList->value);
 		fprintf(dataBase,"%c",',');
 		
 		fprintf(dataBase,"%c",'"');

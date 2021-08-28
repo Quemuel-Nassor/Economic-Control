@@ -201,7 +201,7 @@ void dataFeed(record *recsList){
 	printf("Date: %s",recsList->datetime.format_string(recsList->datetime,DATETIME));
 	printf("\nDescription: %s",recsList->description);
 	// printf("\nCategory: %s",recsList->category);
-	printf("\nValue: %.2Lf",recsList->value);
+	printf("\nValue: %.2lf",recsList->value);
 
 //Receives details data
 //===================================================================
