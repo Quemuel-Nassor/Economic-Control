@@ -195,8 +195,8 @@ char *serialize_to_json(record *list)
         
     for(element = navigate_to_start(list); element != NULL; element = element->next)
     {
-        char *id = to_string(&element->id,"%lu");
-        char *category = to_string(&element->category_id,"%lu");
+        char *id = to_string(element->id,"%lu");
+        char *category = to_string(element->category_id,"%lu");
         char *value = to_string(&element->value,"%Lf");
 
         size_t size = DATETIME_MAX_LENGTH + MAX_DESCRIPTION + MAX_DETAILS + strlen(id) + strlen(category) + strlen(value) + strlen(json_result) + 77;
