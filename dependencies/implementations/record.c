@@ -28,7 +28,7 @@ void show_record(record* item)
     printf("          Date: %s\n", item->datetime.format_string(item->datetime,DATETIME));
     printf("          Category id: %lu\n", item->category_id);
     printf("          Description: %s\n", item->description);
-    printf("          Value: %.2Lf\n", item->value);
+    printf("          Value: %.4lf\n", item->value);
     printf("          Details: %s\n", item->details);
     printf("----------------------------------------------------------------------------------------------------\n");
 }
@@ -197,7 +197,7 @@ char *serialize_to_json(record *list)
     {
         char *id = to_string(element->id,"%lu");
         char *category = to_string(element->category_id,"%lu");
-        char *value = to_string(&element->value,"%Lf");
+        char *value = to_string(&element->value,"%lf");
 
         size_t size = DATETIME_MAX_LENGTH + MAX_DESCRIPTION + MAX_DETAILS + strlen(id) + strlen(category) + strlen(value) + strlen(json_result) + 77;
 

@@ -28,7 +28,7 @@ typedef struct record
     size_t category_id;
     char details[MAX_DETAILS];
     DateTime datetime;
-    long double value;
+    double value;
     void (*add)(struct record* list, struct record* newItem);
     void (*show)(struct record* item);
 } record;
