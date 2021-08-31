@@ -67,60 +67,33 @@ char* string_join(long max_length, char separator, char* parameter, ...)
 }
 
 /*
- * Function to convert any value to string
+ * Function to convert long value to string
  * parameter: value, number to convert
- * parameter: format, format specifier, %li to integer or %Lf to double
  */
-char* to_string(void* value, const char* format)
+char* long_to_string(size_t value)
 {
-    int value_size;
-    char* string_value;
+    int value_size = snprintf(NULL, 0, "%lu", value) + 1;
+    char* string_value= (char*)malloc(sizeof(char) * value_size);
+
+    sprintf(string_value, "%lu", value);
     
-    if (strcmp(format, "%Lf") == 0)
-    {
-        value_size = snprintf(NULL, 0, format, (long double*)value) + 1;
-        string_value = (char*)malloc(sizeof(char) * value_size);
-        strcpy(string_value, "\0");
-        sprintf(string_value, format, (long double*)value);
-    }
-    else if(strcmp(format, "%lf") == 0)
-    {
-        value_size = snprintf(NULL, 0, format, (double*)value) + 1;
-        string_value = (char*)malloc(sizeof(char) * value_size);
-        strcpy(string_value, "\0");
-        sprintf(string_value, format, (double*)value);
-    }
-    else if(strcmp(format, "%f") == 0)
-    {
-        value_size = snprintf(NULL, 0, format, (float*)value) + 1;
-        string_value = (char*)malloc(sizeof(char) * value_size);
-        strcpy(string_value, "\0");
-        sprintf(string_value, format, (float*)value);
-    }
-    else if(strcmp(format, "%lu") == 0)
-    {
-        value_size = snprintf(NULL, 0, format, (size_t*)value) + 1;
-        string_value = (char*)malloc(sizeof(char) * value_size);
-        strcpy(string_value, "\0");
-        sprintf(string_value, format, (size_t*)value);
-    }
-    else if(strcmp(format, "%u") == 0)
-    {
-        value_size = snprintf(NULL, 0, format, (unsigned int*)value) + 1;
-        string_value = (char*)malloc(sizeof(char) * value_size);
-        strcpy(string_value, "\0");
-        sprintf(string_value, format, (unsigned int*)value);
-    }
-    else if(strcmp(format, "%i") == 0)
-    {
-        value_size = snprintf(NULL, 0, format, (int*)value) + 1;
-        string_value = (char*)malloc(sizeof(char) * value_size);
-        strcpy(string_value, "\0");
-        sprintf(string_value, format, (int*)value);
-    }
+    string_value[value_size-1] = '\0';
 
+    return string_value;
+}
 
-    strcat(string_value, "\0");
+/*
+ * Function to convert double value to string
+ * parameter: value, number to convert
+ */
+char* double_to_string(double value)
+{
+    int value_size = snprintf(NULL, 0, "%lf", value) + 1;
+    char* string_value = (char*)malloc(sizeof(char) * value_size);
+
+    sprintf(string_value, "%lf", value);
+    
+    string_value[value_size-1] = '\0';
 
     return string_value;
 }
