@@ -73,16 +73,15 @@ int main(void){
 	
 	// checkDatabase2();
 
-	record *test = new_record_overloaded(1,26.74,new_datetime(),"conteudo aleatorio para serializacao de dados",5,"ab yuu27 129921 fdkjfdkjfkdjfkdfj");
-	test->add(test,new_record_overloaded(2,105.98,new_datetime(),"alguma coisa para preencher",15,"eita lasqeura"));
-	test->add(test,new_record_overloaded(3,49.67,new_datetime(),"ola teste ops",67,"lorem ipsum"));
-	test->add(test,new_record_overloaded(4,15.24,new_datetime(),"conteudo aleatorio para serializacao de dados",12,"ab yuu27 129921 fdkjfdkjfkdjfkdfj"));
+	record *test = new_record_overloaded(10,26.74,new_datetime(),"conteudo aleatorio para serializacao de dados",5,"ab yuu27 129921 fdkjfdkjfkdjfkdfj");
+	test->add(test,new_record_overloaded(20,105.98,new_datetime(),"alguma coisa para preencher",15,"eita lasqeura"));
+	test->add(test,new_record_overloaded(30,49.67,new_datetime(),"ola teste ops",67,"lorem ipsum"));
+	test->add(test,new_record_overloaded(40,15.24,new_datetime(),"conteudo aleatorio para serializacao de dados",12,"ab yuu27 129921 fdkjfdkjfkdjfkdfj"));
 	
 	char *json_result = serialize_to_json(test);
-	printf("json: \n%s",json_result);
-	
+		
 
-	write_file(json_result,WRITE,"./struct_serializada.json");
+	write_file(json_result,WRITE,string_join(INDEFINITE_LENGTH,DIR_SEPARATOR_CHR,".","struct_serializada.json",NULL));
 	
 	clean_list(test);
 	
