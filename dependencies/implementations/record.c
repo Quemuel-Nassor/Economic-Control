@@ -226,6 +226,47 @@ char *serialize_to_json(record *list)
 }
 
 /*
+ * Function to deserialize all records from a json string
+ * return: record list
+ */
+record *deserialize_from_json(char* json_string)
+{
+    int i, aux_count, count = 0;
+    record *result;
+    char** elements_list = string_split("{",&json_string[1],&count);
+    
+    for (i = 0; i < count; i++)
+    {
+        elements_list[i][strlen(elements_list[i])-2] = '\0';
+        char** properties_tuples = string_split(",",elements_list[i],&aux_count);
+
+        size_t id = atol(string_split(":",properties_tuples[0],&aux_count)[1]);
+
+        char* description = string_split("\"",properties_tuples[1],&aux_count)[2];
+
+        size_t category_id = atol(string_split(":",properties_tuples[2],&aux_count)[1]);
+
+        char* details = string_split("\"",properties_tuples[3],&aux_count)[2];
+
+        char* datetime = string_split("\"",properties_tuples[4],&aux_count)[2];
+        
+        char *next_char;
+        double value = strtod(string_split(":",properties_tuples[5],&aux_count)[1],&next_char);
+
+        record* new_element = new_record_overloaded(id, value, datetime_from(datetime), description, category_id, details);
+        
+        if(i == 0)
+        {
+            result = new_element;
+        } else {
+            result->add(result, new_element);
+        }
+    }
+    
+    return result;
+}
+
+/*
  * Default record constructor
  * return: minimally initialized registry
  */
