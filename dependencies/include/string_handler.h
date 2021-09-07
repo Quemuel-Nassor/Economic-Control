@@ -14,6 +14,7 @@
 char* string_join(long max_length, char separator, char* parameter, ...);
 char* long_to_string(size_t value);
 char* double_to_string(double value);
-// char** string_split(char* separator, char* content, int* size);
+char** string_split(char* separator, char* content, int* size);
+int substring_count(char* separator, char* content);
 
 #endif
