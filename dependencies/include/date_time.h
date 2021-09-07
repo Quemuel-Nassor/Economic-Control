@@ -90,7 +90,7 @@ char* datetime_format(DateTime datetime, int format);
 void set_month(DateTime* datetime, int month);
 void set_week_day(DateTime* datetime, int week_day);
 void set_year(DateTime* datetime, int year);
-// DateTime datetime_from(char *string_datetime);
+DateTime datetime_from(char *string_datetime);
 DateTime new_datetime(void);
 DateTime new_datetime_overloaded(int seconds, int minutes, int hours, int month_day, int month, int year, int week_day, int year_day, int is_dst);
 

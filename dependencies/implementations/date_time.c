@@ -136,31 +136,32 @@ void set_year(DateTime* datetime, int year)
  * parameter: string_datetime, datetime in utc string format for database
  * return: datetime structure initialized
  */
-// DateTime datetime_from(char *string_datetime)
-// {
-//     int sz;
-// 	char **datetime = string_split("T",string_datetime,&sz);
-//     char **date = string_split("-",datetime[0],&sz);
-//     char **time = string_split(":",datetime[1],&sz);
-//     char **secs = string_split(".",time[2],&sz);
+DateTime datetime_from(char *string_datetime)
+{
+    int sz;
+	char **datetime = string_split("T",string_datetime,&sz);
+    char **date = string_split("-",datetime[0],&sz);
+    char **time = string_split(":",datetime[1],&sz);
+    char **secs = string_split(".",time[2],&sz);
 
-//     char *ano = date[0];
-//     char *mes = date[1];
-//     char *dia = date[2];
-//     char *hora = time[0];
-//     char *min = time[1];
-//     char *sec = secs[0];
+    char *ano = date[0];
+    char *mes = date[1];
+    char *dia = date[2];
+    char *hora = time[0];
+    char *min = time[1];
+    char *sec = secs[0];
 
-// 	int ano_n = get_value(date[0]);
-// 	int mes_n = get_value(date[1]);
-// 	int dia_n = get_value(date[2]);
-// 	int hora_n = get_value(time[0]);
-// 	int min_n = get_value(time[1]);
-// 	int sec_n = get_value(sec);
+	int ano_n = get_value(date[0]);
+	int mes_n = get_value(date[1]);
+	int dia_n = get_value(date[2]);
+	int hora_n = get_value(time[0]);
+	int min_n = get_value(time[1]);
+	int sec_n = get_value(sec);
 
-// 	DateTime result = new_datetime_overloaded(sec_n,min_n,hora_n,dia_n,mes_n,ano_n,0,0,0);
-//     return result;
-// }
+	DateTime result = new_datetime_overloaded(sec_n,min_n,hora_n,dia_n,mes_n,ano_n,0,0,0);
+
+    return result;
+}
 
 /*
  * Default datetime constructor
